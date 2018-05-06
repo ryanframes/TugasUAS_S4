@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 5.7.12, for Win32 (AMD64)
+-- MySQL dump 10.13  Distrib 5.7.17, for Win64 (x86_64)
 --
 -- Host: localhost    Database: db_perpustakaan
 -- ------------------------------------------------------
--- Server version	5.5.5-10.1.9-MariaDB
+-- Server version	5.5.5-10.1.25-MariaDB
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -81,7 +81,7 @@ DROP TABLE IF EXISTS `t_pinjam`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `t_pinjam` (
-  `no_dok` varchar(10) NOT NULL,
+  `no_dok` varchar(10) NOT NULL COMMENT 'Contoh penomoran : 0001/PB/18 (PB = Pinjam Buku)',
   `tgl_pinjam` date NOT NULL,
   `id_member` int(11) NOT NULL,
   `tgl_kembali` date NOT NULL,
@@ -156,6 +156,14 @@ LOCK TABLES `t_user` WRITE;
 INSERT INTO `t_user` VALUES ('ADMIN','ADMIN',1),('STAFF','STAFF',2);
 /*!40000 ALTER TABLE `t_user` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Dumping events for database 'db_perpustakaan'
+--
+
+--
+-- Dumping routines for database 'db_perpustakaan'
+--
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -166,4 +174,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-04-24 13:57:14
+-- Dump completed on 2018-05-06 22:09:47
