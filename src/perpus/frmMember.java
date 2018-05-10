@@ -88,6 +88,9 @@ public class frmMember extends javax.swing.JInternalFrame {
         cmdAdd.setEnabled(!bol);
         cmdEdit.setEnabled(!bol);
         cmdDelete.setEnabled(!bol);
+        
+        cmdEdit.setEnabled(cls.getPubUserLvl()==1);
+        cmdDelete.setEnabled(cls.getPubUserLvl()==1);
     }
     /**
      * This method is called from within the constructor to initialize the form.

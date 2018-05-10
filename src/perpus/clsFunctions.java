@@ -30,6 +30,36 @@ import org.jdesktop.swingx.JXDatePicker;
  * @author ZSOFT_DEV
  */
 public class clsFunctions {
+    public static String pubUserName;
+    public static int pubUserLvl;
+    /**
+     * @return the pubUserLvl
+     */
+    public int getPubUserLvl() {
+        return pubUserLvl;
+    }
+
+    /**
+     * @param pubUserLvl the pubUserLvl to set
+     */
+    public void setPubUserLvl(int pubUserLvl) {
+        this.pubUserLvl = pubUserLvl;
+    }
+
+    /**
+     * @return the pubUserName
+     */
+    public String getPubUserName() {
+        return pubUserName;
+    }
+
+    /**
+     * @param pubUserName the pubUserName to set
+     */
+    public void setPubUserName(String pubUserName) {
+        this.pubUserName = pubUserName;
+    }
+            
     public void showMsg(String msg, String msgTitle, int msgType) {
         /*0=Error, 1=Info msg, 2 = exclamation, 3=question*/
         JOptionPane.showMessageDialog(null, msg, msgTitle, msgType);
@@ -85,8 +115,7 @@ public class clsFunctions {
     public String getDateVal(JXDatePicker dtp) {
         Calendar cal=Calendar.getInstance();
         SimpleDateFormat formater = new SimpleDateFormat("yyyy-MM-dd");
-        formater.format(dtp.getDate());
-        String ret=formater.format(cal.getTime());
+        String ret=formater.format(dtp.getDate());
         return ret;
     }
     

@@ -14,7 +14,7 @@ import java.util.Date;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
+import java.time.LocalDate;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import org.jdesktop.swingx.MultiSplitLayout;
@@ -25,16 +25,21 @@ import org.jdesktop.swingx.MultiSplitLayout;
  */
 public class frmTransaksi extends javax.swing.JInternalFrame {
     clsConnection oConn=new clsConnection();
-    clsFunctions cls = new clsFunctions();
+    clsFunctions cls=new clsFunctions();
+    boolean isAdd = false;
+    boolean isEdit = false;
     boolean isNew = true;
     /**
      * Creates new form frmTransaksi
      */
     public frmTransaksi() {
         initComponents();
-        cls.setDateVal(dtpTglAwal, new Date());
+        LocalDate today=LocalDate.now(); //first date of month
+        cls.setDateVal(dtpTglAwal, java.sql.Date.valueOf(today.withDayOfMonth(1)));
         cls.setDateVal(dtpTglAkhir, new Date());
         cls.setDateVal(dtpTglPinjam, new Date());
+        cls.setDateVal(dtpTglKembali, new Date());
+        dtpTglKembali.setDate(null);
         displayTrans();
         
         //make datepicker editable = false
@@ -43,20 +48,43 @@ public class frmTransaksi extends javax.swing.JInternalFrame {
         dtpTglPinjam.getEditor().setEditable(false);
         dtpTglKembali.getEditor().setEditable(false);
     }
+    private void cariMember() {
+        try {
+            // TODO add your handling code here:
+            String wCondition = "";
+            if (!txtCariIDMember.getText().equals("")) {
+                wCondition = "where id_member like '%" + txtCariIDMember.getText() + "%'";
+            }
+            if (!txtCariNamaMember.getText().equals("")) {
+                if (wCondition.equals("")) {
+                    wCondition="where nama like '%" + txtCariNamaMember.getText() + "%'";
+                }
+                else {
+                    wCondition= wCondition + " and nama like '%" + txtCariNamaMember.getText() + "%'";
+                }
+            }
+            cls.showTblGrid(tblCariMember, "select id_member as 'ID Member',"
+                    + "nama as 'Nama Member' from t_member " + wCondition + " order by id_member");
+            tblCariMember.setEditingColumn(0);
+            tblCariMember.setEditingRow(0);
+        } catch (SQLException ex) {
+            Logger.getLogger(frmTransaksi.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
     
     private void cariBuku() {
         try {
             // TODO add your handling code here:
             String wCondition = "";
-            if (!txtCariKodeBarang.getText().equals("")) {
-                wCondition = "where barang_kode like '%" + txtCariKodeBarang.getText() + "%'";
+            if (!txtCariKodeBuku.getText().equals("")) {
+                wCondition = "where kd_buku like '%" + txtCariKodeBuku.getText() + "%'";
             }
-            if (!txtCariNamaBarang.getText().equals("")) {
+            if (!txtCariNamaBuku.getText().equals("")) {
                 if (wCondition.equals("")) {
-                    wCondition="where barang_nama like '%" + txtCariNamaBarang.getText() + "%'";
+                    wCondition="where nm_buku like '%" + txtCariNamaBuku.getText() + "%'";
                 }
                 else {
-                    wCondition= wCondition + " and barang_nama like '%" + txtCariNamaBarang.getText() + "%'";
+                    wCondition= wCondition + " and nm_buku like '%" + txtCariNamaBuku.getText() + "%'";
                 }
             }
             cls.showTblGrid(tblCariBuku, "select kd_buku as 'Kode Buku',"
@@ -93,6 +121,11 @@ public class frmTransaksi extends javax.swing.JInternalFrame {
             txtNamaMember.grabFocus();
             return false;
         }
+        if (chkBukuKembali.isSelected() && dtpTglKembali.getDate()==null) {
+            cls.showMsg("Tgl Kembali harus di isi", "Simpan Gagal", 0);
+            dtpTglKembali.grabFocus();
+            return false;
+        }
         if (txtQty.getText().equals("0")) {
             cls.showMsg("Total Buku yang di pinjam harus lebih besar dari nol (0)", "Simpan Gagal", 0);
             txtQty.grabFocus();
@@ -104,8 +137,9 @@ public class frmTransaksi extends javax.swing.JInternalFrame {
     private void displayTrans() {
         try {
             cls.showTblGrid(tblTransaksi, "select no_dok as 'No. Dokumen', tgl_pinjam as 'Tgl Pinjam', "
-                    + "id_member as 'ID Member', tgl_kembali as 'Tgl Kembali', jml_buku as 'Jml. Buku' "
-                    + "from t_pinjam where tgl_pinjam between '" + cls.getDateVal(dtpTglAwal) + " 00:00:00' and "
+                    + "p.id_member as 'ID Member', m.nama as 'Nama Member', tgl_kembali as 'Tgl Kembali', "
+                    + "jml_buku as 'Jml. Buku' from t_pinjam p join t_member m on p.id_member = m.id_member "
+                    + "where tgl_pinjam between '" + cls.getDateVal(dtpTglAwal) + " 00:00:00' and "
                     + "'" + cls.getDateVal(dtpTglAkhir) + " 23:59:59'");
             tblTransaksi.setEditingColumn(0);
             tblTransaksi.setEditingRow(0);
@@ -116,19 +150,21 @@ public class frmTransaksi extends javax.swing.JInternalFrame {
     }
     
     private void showDokumen() {
-        textMode(false);
-        if (tblTransaksi.getRowCount()!=0 || tblTransaksi.getSelectedRow()>0) { 
+        if (tblTransaksi.getRowCount()!=0 && tblTransaksi.getSelectedRow()>=0) { 
             txtDokumen.setText((String) tblTransaksi.getModel().getValueAt(tblTransaksi.getSelectedRow(), 0)); 
             dtpTglPinjam.setDate((Date) tblTransaksi.getModel().getValueAt(tblTransaksi.getSelectedRow(), 1)); 
-            txtIDMember.setText((String) tblTransaksi.getModel().getValueAt(tblTransaksi.getSelectedRow(), 2)); 
-            dtpTglAwal.setDate((Date) tblTransaksi.getModel().getValueAt(tblTransaksi.getSelectedRow(), 3)); 
-            txtQty.setText((String) tblTransaksi.getModel().getValueAt(tblTransaksi.getSelectedRow(), 4)); 
+            txtIDMember.setText((String) tblTransaksi.getModel().getValueAt(tblTransaksi.getSelectedRow(), 2).toString()); 
+            txtNamaMember.setText((String) tblTransaksi.getModel().getValueAt(tblTransaksi.getSelectedRow(), 3).toString()); 
+            dtpTglKembali.setDate((Date) tblTransaksi.getModel().getValueAt(tblTransaksi.getSelectedRow(), 4)); 
+            chkBukuKembali.setSelected(dtpTglKembali.getDate()!=null);
+            txtQty.setText((String) tblTransaksi.getModel().getValueAt(tblTransaksi.getSelectedRow(), 5).toString()); 
             displayTransDet();
         }
         else
         {
             clrForm();
         }
+        textMode(false);
     }
     private void displayTransDet() {
         try {
@@ -141,10 +177,13 @@ public class frmTransaksi extends javax.swing.JInternalFrame {
     }
     
     private void clrForm() {
+        isAdd=false;
+        isEdit=false;
         txtDokumen.setText("");
         txtIDMember.setText("");
         txtNamaMember.setText("");
         chkBukuKembali.setSelected(false);
+        dtpTglKembali.setDate(null);
         txtQty.setText("0");
         displayTransDet();
         txtIDMember.grabFocus();
@@ -157,8 +196,10 @@ public class frmTransaksi extends javax.swing.JInternalFrame {
         txtIDMember.setEnabled(bol);
         txtNamaMember.setEnabled(bol);
         dtpTglPinjam.setEnabled(bol);
-        dtpTglKembali.setEnabled(bol);
+        chkBukuKembali.setEnabled(bol);
+        dtpTglKembali.setEnabled(false);
         txtQty.setEnabled(bol);
+        cmdSearch.setEnabled(bol);
         cmdSave.setEnabled(bol);
         cmdCancel.setEnabled(bol);
         cmdAdd.setEnabled(!bol);
@@ -167,8 +208,29 @@ public class frmTransaksi extends javax.swing.JInternalFrame {
         cmdAddDet.setEnabled(bol);
         cmdEditDet.setEnabled(bol);
         cmdDelDet.setEnabled(bol);
+        
+        cmdEdit.setEnabled(cls.getPubUserLvl()==1);
+        cmdDelete.setEnabled(cls.getPubUserLvl()==1);
     }
     
+    private void getMemberInfo() {
+        ResultSet rs =oConn.getData("select id_member, nama from t_member where "
+                + "id_member = '" + txtIDMember.getText() + "'");
+        try {
+            if (rs.next()) {
+                txtIDMember.setText(rs.getString("id_member"));
+                txtNamaMember.setText(rs.getString("nama"));
+            }
+            else
+            {
+                cls.showMsg("ID Member [" + txtIDMember.getText() + "] tidak terdaftar !", "Cari Member", 2);
+                txtNamaMember.setText("");
+                txtIDMember.grabFocus();
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(frmTransaksi.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -184,11 +246,22 @@ public class frmTransaksi extends javax.swing.JInternalFrame {
         tblCariBuku = new javax.swing.JTable();
         pnlSearchDialog = new javax.swing.JPanel();
         jLabel16 = new javax.swing.JLabel();
-        txtCariKodeBarang = new javax.swing.JTextField();
-        txtCariNamaBarang = new javax.swing.JTextField();
+        txtCariKodeBuku = new javax.swing.JTextField();
+        txtCariNamaBuku = new javax.swing.JTextField();
         jLabel17 = new javax.swing.JLabel();
         cmdCariBarang = new javax.swing.JButton();
         cmdPilihBarang = new javax.swing.JButton();
+        cari_Member = new javax.swing.JDialog();
+        bgCariBarang1 = new javax.swing.JPanel();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        tblCariMember = new javax.swing.JTable();
+        pnlSearchDialog1 = new javax.swing.JPanel();
+        jLabel18 = new javax.swing.JLabel();
+        txtCariIDMember = new javax.swing.JTextField();
+        txtCariNamaMember = new javax.swing.JTextField();
+        jLabel19 = new javax.swing.JLabel();
+        cmdCariMember = new javax.swing.JButton();
+        cmdPilihMember = new javax.swing.JButton();
         pnlForm = new javax.swing.JPanel();
         pnlTitle = new javax.swing.JPanel();
         lblTitle = new javax.swing.JLabel();
@@ -251,14 +324,14 @@ public class frmTransaksi extends javax.swing.JInternalFrame {
         jLabel16.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
         jLabel16.setText("Kode Buku");
 
-        txtCariKodeBarang.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
-        txtCariKodeBarang.addKeyListener(new java.awt.event.KeyAdapter() {
+        txtCariKodeBuku.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
+        txtCariKodeBuku.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
-                txtCariKodeBarangKeyPressed(evt);
+                txtCariKodeBukuKeyPressed(evt);
             }
         });
 
-        txtCariNamaBarang.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
+        txtCariNamaBuku.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
 
         jLabel17.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
         jLabel17.setText("Nama Buku");
@@ -323,13 +396,13 @@ public class frmTransaksi extends javax.swing.JInternalFrame {
                 .addGap(44, 44, 44)
                 .addGroup(pnlSearchDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(pnlSearchDialogLayout.createSequentialGroup()
-                        .addComponent(txtCariKodeBarang, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtCariKodeBuku, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(cmdCariBarang, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(cmdPilihBarang, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 16, Short.MAX_VALUE))
-                    .addComponent(txtCariNamaBarang))
+                    .addComponent(txtCariNamaBuku))
                 .addContainerGap())
         );
         pnlSearchDialogLayout.setVerticalGroup(
@@ -340,7 +413,7 @@ public class frmTransaksi extends javax.swing.JInternalFrame {
                         .addGap(3, 3, 3)
                         .addComponent(jLabel16))
                     .addGroup(pnlSearchDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(txtCariKodeBarang, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtCariKodeBuku, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(cmdCariBarang, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(cmdPilihBarang, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -348,7 +421,7 @@ public class frmTransaksi extends javax.swing.JInternalFrame {
                     .addGroup(pnlSearchDialogLayout.createSequentialGroup()
                         .addGap(3, 3, 3)
                         .addComponent(jLabel17))
-                    .addComponent(txtCariNamaBarang, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(txtCariNamaBuku, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
 
         javax.swing.GroupLayout bgCariBarangLayout = new javax.swing.GroupLayout(bgCariBarang);
@@ -372,8 +445,6 @@ public class frmTransaksi extends javax.swing.JInternalFrame {
                 .addContainerGap())
         );
 
-        pnlSearchDialog.getAccessibleContext().setAccessibleName("Cari Buku");
-
         javax.swing.GroupLayout cari_BukuLayout = new javax.swing.GroupLayout(cari_Buku.getContentPane());
         cari_Buku.getContentPane().setLayout(cari_BukuLayout);
         cari_BukuLayout.setHorizontalGroup(
@@ -383,6 +454,160 @@ public class frmTransaksi extends javax.swing.JInternalFrame {
         cari_BukuLayout.setVerticalGroup(
             cari_BukuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(bgCariBarang, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+
+        bgCariBarang1.setBackground(new java.awt.Color(27, 161, 226));
+
+        tblCariMember.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
+        tblCariMember.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane5.setViewportView(tblCariMember);
+
+        pnlSearchDialog1.setBackground(new java.awt.Color(255, 255, 255));
+        pnlSearchDialog1.setBorder(javax.swing.BorderFactory.createTitledBorder("Cari Member"));
+
+        jLabel18.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
+        jLabel18.setText("ID Member");
+
+        txtCariIDMember.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
+        txtCariIDMember.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtCariIDMemberKeyPressed(evt);
+            }
+        });
+
+        txtCariNamaMember.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
+
+        jLabel19.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
+        jLabel19.setText("Nama Member");
+
+        cmdCariMember.setBackground(new java.awt.Color(255, 242, 157));
+        cmdCariMember.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
+        cmdCariMember.setIcon(new javax.swing.ImageIcon(getClass().getResource("/perpus/Img/search.png"))); // NOI18N
+        cmdCariMember.setText("Cari");
+        cmdCariMember.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.RAISED, new java.awt.Color(51, 51, 51), new java.awt.Color(51, 51, 51)));
+        cmdCariMember.setContentAreaFilled(false);
+        cmdCariMember.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        cmdCariMember.setMaximumSize(new java.awt.Dimension(87, 21));
+        cmdCariMember.setMinimumSize(new java.awt.Dimension(87, 21));
+        cmdCariMember.setPreferredSize(new java.awt.Dimension(87, 21));
+        cmdCariMember.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                cmdCariMemberMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                cmdCariMemberMouseExited(evt);
+            }
+        });
+        cmdCariMember.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdCariMemberActionPerformed(evt);
+            }
+        });
+
+        cmdPilihMember.setBackground(new java.awt.Color(255, 242, 157));
+        cmdPilihMember.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
+        cmdPilihMember.setIcon(new javax.swing.ImageIcon(getClass().getResource("/perpus/Img/apply_gui_16.png"))); // NOI18N
+        cmdPilihMember.setText("Pilih");
+        cmdPilihMember.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.RAISED, new java.awt.Color(51, 51, 51), new java.awt.Color(51, 51, 51)));
+        cmdPilihMember.setContentAreaFilled(false);
+        cmdPilihMember.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        cmdPilihMember.setMaximumSize(new java.awt.Dimension(87, 21));
+        cmdPilihMember.setMinimumSize(new java.awt.Dimension(87, 21));
+        cmdPilihMember.setPreferredSize(new java.awt.Dimension(87, 21));
+        cmdPilihMember.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                cmdPilihMemberMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                cmdPilihMemberMouseExited(evt);
+            }
+        });
+        cmdPilihMember.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdPilihMemberActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout pnlSearchDialog1Layout = new javax.swing.GroupLayout(pnlSearchDialog1);
+        pnlSearchDialog1.setLayout(pnlSearchDialog1Layout);
+        pnlSearchDialog1Layout.setHorizontalGroup(
+            pnlSearchDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlSearchDialog1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnlSearchDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel19)
+                    .addComponent(jLabel18))
+                .addGap(33, 33, 33)
+                .addGroup(pnlSearchDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlSearchDialog1Layout.createSequentialGroup()
+                        .addComponent(txtCariIDMember, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cmdCariMember, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cmdPilihMember, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 16, Short.MAX_VALUE))
+                    .addComponent(txtCariNamaMember))
+                .addContainerGap())
+        );
+        pnlSearchDialog1Layout.setVerticalGroup(
+            pnlSearchDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlSearchDialog1Layout.createSequentialGroup()
+                .addGroup(pnlSearchDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlSearchDialog1Layout.createSequentialGroup()
+                        .addGap(3, 3, 3)
+                        .addComponent(jLabel18))
+                    .addGroup(pnlSearchDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(txtCariIDMember, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(cmdCariMember, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(cmdPilihMember, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pnlSearchDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlSearchDialog1Layout.createSequentialGroup()
+                        .addGap(3, 3, 3)
+                        .addComponent(jLabel19))
+                    .addComponent(txtCariNamaMember, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+        );
+
+        javax.swing.GroupLayout bgCariBarang1Layout = new javax.swing.GroupLayout(bgCariBarang1);
+        bgCariBarang1.setLayout(bgCariBarang1Layout);
+        bgCariBarang1Layout.setHorizontalGroup(
+            bgCariBarang1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(bgCariBarang1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(bgCariBarang1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(pnlSearchDialog1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        bgCariBarang1Layout.setVerticalGroup(
+            bgCariBarang1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, bgCariBarang1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(pnlSearchDialog1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 264, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+
+        javax.swing.GroupLayout cari_MemberLayout = new javax.swing.GroupLayout(cari_Member.getContentPane());
+        cari_Member.getContentPane().setLayout(cari_MemberLayout);
+        cari_MemberLayout.setHorizontalGroup(
+            cari_MemberLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(bgCariBarang1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        cari_MemberLayout.setVerticalGroup(
+            cari_MemberLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(bgCariBarang1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
@@ -685,6 +910,11 @@ public class frmTransaksi extends javax.swing.JInternalFrame {
 
         txtIDMember.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
         txtIDMember.setEnabled(false);
+        txtIDMember.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtIDMemberKeyPressed(evt);
+            }
+        });
 
         txtNamaMember.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
         txtNamaMember.setHorizontalAlignment(javax.swing.JTextField.LEFT);
@@ -713,7 +943,18 @@ public class frmTransaksi extends javax.swing.JInternalFrame {
 
         chkBukuKembali.setForeground(new java.awt.Color(255, 255, 255));
         chkBukuKembali.setText("Buku Dikembalikan");
+        chkBukuKembali.setEnabled(false);
         chkBukuKembali.setOpaque(false);
+        chkBukuKembali.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                chkBukuKembaliItemStateChanged(evt);
+            }
+        });
+        chkBukuKembali.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                chkBukuKembaliMouseClicked(evt);
+            }
+        });
 
         cmdSearch.setBackground(new java.awt.Color(255, 255, 255));
         cmdSearch.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
@@ -721,6 +962,7 @@ public class frmTransaksi extends javax.swing.JInternalFrame {
         cmdSearch.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.RAISED, new java.awt.Color(51, 51, 51), new java.awt.Color(51, 51, 51)));
         cmdSearch.setContentAreaFilled(false);
         cmdSearch.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        cmdSearch.setEnabled(false);
         cmdSearch.setMaximumSize(new java.awt.Dimension(87, 21));
         cmdSearch.setMinimumSize(new java.awt.Dimension(87, 21));
         cmdSearch.setOpaque(true);
@@ -839,8 +1081,7 @@ public class frmTransaksi extends javax.swing.JInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(cmdEditDet, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cmdDelDet, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, 0))
+                .addComponent(cmdDelDet, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         pnlDetailLayout.setVerticalGroup(
             pnlDetailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -898,8 +1139,7 @@ public class frmTransaksi extends javax.swing.JInternalFrame {
                                     .addGap(15, 15, 15)
                                     .addComponent(txtNamaMember, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE))))
                         .addGap(126, 126, 126)
-                        .addComponent(pnlDetail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(pnlDetail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
             .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 938, Short.MAX_VALUE)
@@ -986,18 +1226,37 @@ public class frmTransaksi extends javax.swing.JInternalFrame {
     private void cmdSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdSaveActionPerformed
         // TODO add your handling code here:
         if (!allowSave()){ return; }
+        String tglKembali=null;
+        if (chkBukuKembali.isSelected()) {
+            tglKembali="'" + cls.getDateVal(dtpTglKembali) + "'";
+        }
+        else
+        {
+            tglKembali="null";
+        }
         try {
-            if (txtDokumen.isEnabled()) {
-                oConn.setData("insert into t_buku (kd_buku, nm_buku, "
-                    + "th_penerbit, nm_penerbit, nm_penulis, deskripsi, stok_buku) "
-                    + "values ('" + txtDokumen.getText() + "','" + txtNamaMember.getText() + "', "
-                    + "'" + txtNamaMember.getText() + "', '" + txtIDMember.getText() + "', "
-                    + "'" + txtQty.getText() + "')");
+            if (isAdd) {
+                oConn.setData("insert into t_pinjam (no_dok, tgl_pinjam, "
+                    + "id_member, tgl_kembali, jml_buku, nm_user) "
+                    + "values ('" + txtDokumen.getText() + "','" + cls.getDateVal(dtpTglPinjam) + "', "
+                    + "'" + txtIDMember.getText() + "', " + tglKembali + ", "
+                    + "'" + txtQty.getText() + "', '" + cls.getPubUserName() + "')");
             }
-            else {
-                oConn.setData("update t_buku set nm_buku = '" + txtNamaMember.getText() + "', "
-                    + "th_penerbit = " + txtNamaMember.getText() + ", nm_penerbit = '" + txtIDMember.getText() + "', "
-                    + "stok_buku = '" + txtQty.getText() + "' where kd_buku = '" + txtDokumen.getText() + "'");
+            if (isEdit) {
+                oConn.setData("update t_pinjam set id_member = '" + txtIDMember.getText() + "', "
+                    + "tgl_kembali= " + tglKembali + ", jml_buku = '" + txtQty.getText() + "', "
+                    + "nm_user = '" + cls.getPubUserName() + "' where no_dok = '" + txtDokumen.getText() + "'");
+                
+                //clear prev det pinjam buku
+                oConn.setData("delete from t_pinjam_det where no_dok = '" + txtDokumen.getText() + "'");
+            }
+            
+            //save detail pinjaman buku
+            String kd_buku;
+            for (int i=0;i<tblDetail.getRowCount();i++) {
+                kd_buku=(String) tblDetail.getModel().getValueAt(i, 0);
+                oConn.setData("insert into t_pinjam_det (no_dok, kd_buku) values "
+                        + "('" + txtDokumen.getText() + "', '" + kd_buku + "')");
             }
             textMode(false);
             clrForm();
@@ -1036,21 +1295,21 @@ public class frmTransaksi extends javax.swing.JInternalFrame {
     private void cmdDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdDeleteActionPerformed
         // TODO add your handling code here:
         if (txtDokumen.getText().equals("")) {
-            cls.showMsg("Harap pilih buku yang akan dihapus !", "Hapus Gagal", 2);
+            cls.showMsg("Harap pilih dokumen yang akan dihapus !", "Hapus Gagal", 2);
             txtDokumen.grabFocus();
             return;
         }
         int btn = JOptionPane.YES_NO_OPTION;
         int res=JOptionPane.showConfirmDialog(null,"Apakah anda yakin ingin "
-            + "menghapus data buku [" + txtDokumen.getText() + " - " +
+            + "menghapus dokumen no. [" + txtDokumen.getText() + " - " +
             txtNamaMember.getText()  + "] ?","Hapus Data",btn);
         if (res==JOptionPane.YES_OPTION){
             try {
-                oConn.setData("delete from t_buku where kd_buku = '"
+                oConn.setData("delete from t_pinjam where no_dok = '"
                     + txtDokumen.getText() + "'");
-                cmdDisplay.doClick();
-                cls.showMsg("Kode Buku ["+ txtDokumen.getText() +" - " +
+                cls.showMsg("Dokumen No. ["+ txtDokumen.getText() +" - " +
                     txtNamaMember.getText() + "] berhasil di hapus.", "Hapus Berhasil", 0);
+                cmdDisplay.doClick();
                 textMode(true);
                 clrForm();
             } catch (SQLException ex) {
@@ -1074,6 +1333,7 @@ public class frmTransaksi extends javax.swing.JInternalFrame {
         textMode(true);
         clrForm();
         genDocNo();
+        isAdd=true;
     }//GEN-LAST:event_cmdAddActionPerformed
 
     private void cmdEditMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cmdEditMouseEntered
@@ -1089,12 +1349,13 @@ public class frmTransaksi extends javax.swing.JInternalFrame {
     private void cmdEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdEditActionPerformed
         // TODO add your handling code here:
         if (txtDokumen.getText().equals("")) {
-            cls.showMsg("Harap pilih user yang akan di ubah",
+            cls.showMsg("Harap pilih dokumen yang akan di ubah",
                 "Ubah Gagal", 2);
             return;
         }
         textMode(true);
         txtDokumen.setEnabled(false);
+        isEdit=true;
     }//GEN-LAST:event_cmdEditActionPerformed
 
     private void cmdCancelMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cmdCancelMouseEntered
@@ -1109,8 +1370,8 @@ public class frmTransaksi extends javax.swing.JInternalFrame {
 
     private void cmdCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdCancelActionPerformed
         // TODO add your handling code here:
-        textMode(false);
         clrForm();
+        textMode(false);
     }//GEN-LAST:event_cmdCancelActionPerformed
 
     private void cmdDisplayMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cmdDisplayMouseEntered
@@ -1129,14 +1390,21 @@ public class frmTransaksi extends javax.swing.JInternalFrame {
 
     private void cmdSearchMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cmdSearchMouseEntered
         // TODO add your handling code here:
+        cmdSearch.setBackground(new Color(255,242,157));
     }//GEN-LAST:event_cmdSearchMouseEntered
 
     private void cmdSearchMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cmdSearchMouseExited
         // TODO add your handling code here:
+        cmdSearch.setBackground(Color.white);
     }//GEN-LAST:event_cmdSearchMouseExited
 
     private void cmdSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdSearchActionPerformed
         // TODO add your handling code here:
+        cariMember();
+        cari_Member.pack();
+        cari_Member.setModal(true);
+        cari_Member.setLocationRelativeTo(this);
+        cari_Member.setVisible(true);
     }//GEN-LAST:event_cmdSearchActionPerformed
 
     private void cmdAddDetMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cmdAddDetMouseEntered
@@ -1161,17 +1429,17 @@ public class frmTransaksi extends javax.swing.JInternalFrame {
 
     private void cmdEditDetMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cmdEditDetMouseEntered
         // TODO add your handling code here:
-        cmdEdit.setBackground(new Color(255,242,157));
+        cmdEditDet.setBackground(new Color(255,242,157));
     }//GEN-LAST:event_cmdEditDetMouseEntered
 
     private void cmdEditDetMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cmdEditDetMouseExited
         // TODO add your handling code here:
-        cmdEdit.setBackground(new Color(255,255,255));
+        cmdEditDet.setBackground(new Color(255,255,255));
     }//GEN-LAST:event_cmdEditDetMouseExited
 
     private void cmdEditDetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdEditDetActionPerformed
         // TODO add your handling code here:
-        if (tblDetail.getSelectedRow()==0) {
+        if (tblDetail.getSelectedRow()==-1) {
             cls.showMsg("Harap pilih buku yang akan diubah !", "Hapus Gagal", 2);
             tblCariBuku.grabFocus();
             return;
@@ -1196,7 +1464,7 @@ public class frmTransaksi extends javax.swing.JInternalFrame {
 
     private void cmdDelDetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdDelDetActionPerformed
         // TODO add your handling code here:
-        if (tblDetail.getSelectedRow()==0) {
+        if (tblDetail.getSelectedRow()==-1) {
             cls.showMsg("Harap pilih buku yang akan dihapus !", "Hapus Gagal", 2);
             tblDetail.grabFocus();
             return;
@@ -1216,9 +1484,9 @@ public class frmTransaksi extends javax.swing.JInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_formFocusLost
 
-    private void txtCariKodeBarangKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCariKodeBarangKeyPressed
+    private void txtCariKodeBukuKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCariKodeBukuKeyPressed
         // TODO add your handling code here:
-    }//GEN-LAST:event_txtCariKodeBarangKeyPressed
+    }//GEN-LAST:event_txtCariKodeBukuKeyPressed
 
     private void cmdCariBarangMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cmdCariBarangMouseEntered
         // TODO add your handling code here:
@@ -1248,7 +1516,7 @@ public class frmTransaksi extends javax.swing.JInternalFrame {
         // TODO add your handling code here:
         if (tblCariBuku.getRowCount()==0) {
             cls.showMsg("Harap pilih buku yang akan di tambahkan !", "Cari Data", 0);
-            txtCariKodeBarang.grabFocus();
+            txtCariKodeBuku.grabFocus();
             return;
         }
         String kd_bk=(String) tblCariBuku.getModel().getValueAt(tblCariBuku.getSelectedRow(), 0);
@@ -1263,20 +1531,85 @@ public class frmTransaksi extends javax.swing.JInternalFrame {
         }
         else
         {
-            model.setValueAt((String) tblCariBuku.getModel().getValueAt(tblCariBuku.getSelectedRow(), 0), tblDetail.getSelectedRow(),  0);
+            model.setValueAt(kd_bk, tblDetail.getSelectedRow(), 0);
+            model.setValueAt(nm_buku, tblDetail.getSelectedRow(), 1);
         }
+        txtQty.setText(String.valueOf(tblDetail.getRowCount()));
         cari_Buku.setVisible(false);
     }//GEN-LAST:event_cmdPilihBarangActionPerformed
+
+    private void chkBukuKembaliItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_chkBukuKembaliItemStateChanged
+        // TODO add your handling code here:
+        
+    }//GEN-LAST:event_chkBukuKembaliItemStateChanged
+
+    private void chkBukuKembaliMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_chkBukuKembaliMouseClicked
+        // TODO add your handling code here:
+        dtpTglKembali.setEnabled(chkBukuKembali.isSelected());
+    }//GEN-LAST:event_chkBukuKembaliMouseClicked
+
+    private void txtIDMemberKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtIDMemberKeyPressed
+        // TODO add your handling code here:
+        if (evt.getKeyCode()==KeyEvent.VK_ENTER) {
+            getMemberInfo();
+        }
+    }//GEN-LAST:event_txtIDMemberKeyPressed
+
+    private void txtCariIDMemberKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCariIDMemberKeyPressed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtCariIDMemberKeyPressed
+
+    private void cmdCariMemberMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cmdCariMemberMouseEntered
+        // TODO add your handling code here:
+        cmdCariMember.setOpaque(true);
+    }//GEN-LAST:event_cmdCariMemberMouseEntered
+
+    private void cmdCariMemberMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cmdCariMemberMouseExited
+        // TODO add your handling code here:
+        cmdCariMember.setOpaque(false);
+    }//GEN-LAST:event_cmdCariMemberMouseExited
+
+    private void cmdCariMemberActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdCariMemberActionPerformed
+        // TODO add your handling code here:
+        cariMember();
+    }//GEN-LAST:event_cmdCariMemberActionPerformed
+
+    private void cmdPilihMemberMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cmdPilihMemberMouseEntered
+        // TODO add your handling code here:
+        cmdPilihMember.setOpaque(true);
+    }//GEN-LAST:event_cmdPilihMemberMouseEntered
+
+    private void cmdPilihMemberMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cmdPilihMemberMouseExited
+        // TODO add your handling code here:
+        cmdPilihMember.setOpaque(false);
+    }//GEN-LAST:event_cmdPilihMemberMouseExited
+
+    private void cmdPilihMemberActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdPilihMemberActionPerformed
+        // TODO add your handling code here:
+        if (tblCariMember.getRowCount()==0) {
+            cls.showMsg("Harap pilih member yang akan di meminjam !", "Cari Data", 0);
+            txtCariIDMember.grabFocus();
+            return;
+        }
+        String id_member=(String) tblCariMember.getModel().getValueAt(tblCariMember.getSelectedRow(), 0).toString();
+        String nm_member=(String) tblCariMember.getModel().getValueAt(tblCariMember.getSelectedRow(), 1);
+        txtIDMember.setText(id_member);
+        txtNamaMember.setText(nm_member);
+        cari_Member.setVisible(false);
+    }//GEN-LAST:event_cmdPilihMemberActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel bgCariBarang;
+    private javax.swing.JPanel bgCariBarang1;
     private javax.swing.JDialog cari_Buku;
+    private javax.swing.JDialog cari_Member;
     private javax.swing.JCheckBox chkBukuKembali;
     private javax.swing.JButton cmdAdd;
     private javax.swing.JButton cmdAddDet;
     private javax.swing.JButton cmdCancel;
     private javax.swing.JButton cmdCariBarang;
+    private javax.swing.JButton cmdCariMember;
     private javax.swing.JButton cmdClose;
     private javax.swing.JButton cmdDelDet;
     private javax.swing.JButton cmdDelete;
@@ -1284,6 +1617,7 @@ public class frmTransaksi extends javax.swing.JInternalFrame {
     private javax.swing.JButton cmdEdit;
     private javax.swing.JButton cmdEditDet;
     private javax.swing.JButton cmdPilihBarang;
+    private javax.swing.JButton cmdPilihMember;
     private javax.swing.JButton cmdSave;
     private javax.swing.JButton cmdSearch;
     private org.jdesktop.swingx.JXDatePicker dtpTglAkhir;
@@ -1296,6 +1630,8 @@ public class frmTransaksi extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
+    private javax.swing.JLabel jLabel18;
+    private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -1306,16 +1642,21 @@ public class frmTransaksi extends javax.swing.JInternalFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JLabel lblTitle;
     private javax.swing.JPanel pnlDetail;
     private javax.swing.JPanel pnlForm;
     private javax.swing.JPanel pnlSearchDialog;
+    private javax.swing.JPanel pnlSearchDialog1;
     private javax.swing.JPanel pnlTitle;
     private javax.swing.JTable tblCariBuku;
+    private javax.swing.JTable tblCariMember;
     private javax.swing.JTable tblDetail;
     private javax.swing.JTable tblTransaksi;
-    private javax.swing.JTextField txtCariKodeBarang;
-    private javax.swing.JTextField txtCariNamaBarang;
+    private javax.swing.JTextField txtCariIDMember;
+    private javax.swing.JTextField txtCariKodeBuku;
+    private javax.swing.JTextField txtCariNamaBuku;
+    private javax.swing.JTextField txtCariNamaMember;
     private javax.swing.JTextField txtDokumen;
     private javax.swing.JTextField txtIDMember;
     private javax.swing.JTextField txtNamaMember;

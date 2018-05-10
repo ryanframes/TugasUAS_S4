@@ -357,6 +357,8 @@ public class frmLogin extends javax.swing.JFrame {
             ResultSet rs=oConn.getData("select * from t_user where nm_user = '"+ txtUser.getText() +"' and "
                     + "password='"+ String.valueOf(txtPassword.getPassword()) +"' ");
             if (rs.next()) {
+                cls.setPubUserName(txtUser.getText());
+                cls.setPubUserLvl(rs.getInt("level"));
                 frmMain frm = new frmMain();
                 frm.setVisible(true);
                 dispose();

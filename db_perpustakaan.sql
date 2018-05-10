@@ -24,7 +24,7 @@ DROP TABLE IF EXISTS `t_buku`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `t_buku` (
   `kd_buku` varchar(8) NOT NULL,
-  `nm_buku` varchar(25) NOT NULL,
+  `nm_buku` varchar(50) NOT NULL,
   `th_penerbit` int(4) NOT NULL,
   `nm_penerbit` varchar(25) NOT NULL,
   `nm_penulis` varchar(20) NOT NULL,
@@ -41,7 +41,7 @@ CREATE TABLE `t_buku` (
 
 LOCK TABLES `t_buku` WRITE;
 /*!40000 ALTER TABLE `t_buku` DISABLE KEYS */;
-INSERT INTO `t_buku` VALUES ('BK01','LTM Pertemuan 1',2001,'BSI','Faris Junaedi','Jawaban untuk LTM Pertemuan ke - 1 dan penjelasannya',3);
+INSERT INTO `t_buku` VALUES ('BK01','LTM Pertemuan 1',2001,'BSI','Faris Junaedi','Jawaban untuk LTM Pertemuan ke - 1 dan penjelasannya',3),('BK02','Tutorial Laravel untuk Pemula',2019,'Gramedia Pustaka','Derianto Sumbawa','Tutorial Laravel dengan koneksi database MySQL',2);
 /*!40000 ALTER TABLE `t_buku` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -84,7 +84,7 @@ CREATE TABLE `t_pinjam` (
   `no_dok` varchar(10) NOT NULL COMMENT 'Contoh penomoran : 0001/PB/18 (PB = Pinjam Buku)',
   `tgl_pinjam` date NOT NULL,
   `id_member` int(11) NOT NULL,
-  `tgl_kembali` date NOT NULL,
+  `tgl_kembali` date DEFAULT NULL,
   `jml_buku` int(11) NOT NULL,
   `nm_user` varchar(15) NOT NULL,
   PRIMARY KEY (`no_dok`),
@@ -102,6 +102,7 @@ CREATE TABLE `t_pinjam` (
 
 LOCK TABLES `t_pinjam` WRITE;
 /*!40000 ALTER TABLE `t_pinjam` DISABLE KEYS */;
+INSERT INTO `t_pinjam` VALUES ('0001/PB/18','2018-05-02',65798413,'2018-05-09',1,'admin'),('0002/PB/18','2018-05-03',2121,NULL,2,'admin');
 /*!40000 ALTER TABLE `t_pinjam` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -128,6 +129,7 @@ CREATE TABLE `t_pinjam_det` (
 
 LOCK TABLES `t_pinjam_det` WRITE;
 /*!40000 ALTER TABLE `t_pinjam_det` DISABLE KEYS */;
+INSERT INTO `t_pinjam_det` VALUES ('0001/PB/18','BK01'),('0002/PB/18','BK02'),('0002/PB/18','BK01');
 /*!40000 ALTER TABLE `t_pinjam_det` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -174,4 +176,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-05-06 22:09:47
+-- Dump completed on 2018-05-10 23:41:05
