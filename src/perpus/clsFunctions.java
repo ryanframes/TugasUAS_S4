@@ -110,6 +110,7 @@ public class clsFunctions {
             modTbl.addRow(rowData);
         }
         obj.setModel(modTbl);
+        obj.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
     }
     
     public String getDateVal(JXDatePicker dtp) {

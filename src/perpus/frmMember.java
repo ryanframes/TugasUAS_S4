@@ -30,6 +30,9 @@ public class frmMember extends javax.swing.JInternalFrame {
         dtpJoin.setFormats("yyyy-MM-dd");
         dtpJoin.getEditor().setEditable(false); //make editor of jxdatepicker disabled
         
+        cmdEdit.setEnabled(cls.getPubUserLvl()==1);
+        cmdDelete.setEnabled(cls.getPubUserLvl()==1);
+        
         cmbJenisKelamin.removeAllItems();
         cmbJenisKelamin.addItem("");
         cmbJenisKelamin.addItem("Pria");
@@ -78,6 +81,17 @@ public class frmMember extends javax.swing.JInternalFrame {
     }
         
     private void textMode(boolean bol) {
+        
+        if (cls.getPubUserLvl()==2) {
+            cmdEdit.setEnabled(false);
+            cmdDelete.setEnabled(false);
+        }
+        else
+        {
+            cmdEdit.setEnabled(!bol);
+            cmdDelete.setEnabled(!bol);
+        }
+        
         txtIDMember.setEnabled(bol);
         txtNama.setEnabled(bol);
         txtNoHp.setEnabled(bol);
@@ -86,11 +100,6 @@ public class frmMember extends javax.swing.JInternalFrame {
         cmdSave.setEnabled(bol);
         cmdCancel.setEnabled(bol);
         cmdAdd.setEnabled(!bol);
-        cmdEdit.setEnabled(!bol);
-        cmdDelete.setEnabled(!bol);
-        
-        cmdEdit.setEnabled(cls.getPubUserLvl()==1);
-        cmdDelete.setEnabled(cls.getPubUserLvl()==1);
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -678,7 +687,7 @@ public class frmMember extends javax.swing.JInternalFrame {
     private void cmdEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdEditActionPerformed
         // TODO add your handling code here:
         if (txtIDMember.getText().equals("")) {
-            cls.showMsg("Harap pilih user yang akan di ubah",
+            cls.showMsg("Harap pilih member yang akan di ubah",
                 "Ubah Gagal", 2);
             return;
         }

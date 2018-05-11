@@ -23,6 +23,8 @@ public class frmBuku extends javax.swing.JInternalFrame {
     public frmBuku() {
         initComponents();
         cmdDisplay.doClick();
+        cmdEdit.setEnabled(cls.getPubUserLvl()==1);
+        cmdDelete.setEnabled(cls.getPubUserLvl()==1);
     }
 
     private boolean allowSave() {
@@ -79,6 +81,16 @@ public class frmBuku extends javax.swing.JInternalFrame {
     }
         
     private void textMode(boolean bol) {
+        
+        if (cls.getPubUserLvl()==2) {
+            cmdEdit.setEnabled(false);
+            cmdDelete.setEnabled(false);
+        }
+        else
+        {
+            cmdEdit.setEnabled(!bol);
+            cmdDelete.setEnabled(!bol);
+        }
         txtKodeBuku.setEnabled(bol);
         txtNamaBuku.setEnabled(bol);
         txtThn.setEnabled(bol);
@@ -89,11 +101,8 @@ public class frmBuku extends javax.swing.JInternalFrame {
         cmdSave.setEnabled(bol);
         cmdCancel.setEnabled(bol);
         cmdAdd.setEnabled(!bol);
-        cmdEdit.setEnabled(!bol);
-        cmdDelete.setEnabled(!bol);
         
-        cmdEdit.setEnabled(cls.getPubUserLvl()==1);
-        cmdDelete.setEnabled(cls.getPubUserLvl()==1);
+        
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -702,7 +711,7 @@ public class frmBuku extends javax.swing.JInternalFrame {
     private void cmdEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdEditActionPerformed
         // TODO add your handling code here:
         if (txtKodeBuku.getText().equals("")) {
-            cls.showMsg("Harap pilih user yang akan di ubah", 
+            cls.showMsg("Harap pilih buku yang akan di ubah", 
                 "Ubah Gagal", 2); 
             return;
         }
