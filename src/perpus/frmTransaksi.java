@@ -34,6 +34,9 @@ public class frmTransaksi extends javax.swing.JInternalFrame {
      */
     public frmTransaksi() {
         initComponents();
+        cmdEdit.setEnabled(cls.getPubUserLvl()==1);
+        cmdDelete.setEnabled(cls.getPubUserLvl()==1);
+        
         LocalDate today=LocalDate.now(); //first date of month
         cls.setDateVal(dtpTglAwal, java.sql.Date.valueOf(today.withDayOfMonth(1)));
         cls.setDateVal(dtpTglAkhir, new Date());
@@ -193,6 +196,16 @@ public class frmTransaksi extends javax.swing.JInternalFrame {
     }
         
     private void textMode(boolean bol) {
+        if (cls.getPubUserLvl()==2) {
+            cmdEdit.setEnabled(false);
+            cmdDelete.setEnabled(false);
+        }
+        else
+        {
+            cmdEdit.setEnabled(!bol);
+            cmdDelete.setEnabled(!bol);
+        }
+        
         txtIDMember.setEnabled(bol);
         txtNamaMember.setEnabled(bol);
         dtpTglPinjam.setEnabled(bol);
@@ -203,14 +216,9 @@ public class frmTransaksi extends javax.swing.JInternalFrame {
         cmdSave.setEnabled(bol);
         cmdCancel.setEnabled(bol);
         cmdAdd.setEnabled(!bol);
-        cmdEdit.setEnabled(!bol);
-        cmdDelete.setEnabled(!bol);
         cmdAddDet.setEnabled(bol);
         cmdEditDet.setEnabled(bol);
         cmdDelDet.setEnabled(bol);
-        
-        cmdEdit.setEnabled(cls.getPubUserLvl()==1);
-        cmdDelete.setEnabled(cls.getPubUserLvl()==1);
     }
     
     private void getMemberInfo() {
@@ -874,12 +882,12 @@ public class frmTransaksi extends javax.swing.JInternalFrame {
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel6)
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(15, 15, 15)
+                        .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(10, 10, 10)
                         .addComponent(dtpTglAwal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(15, 15, 15)
-                        .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(15, 15, 15)
+                        .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(10, 10, 10)
                         .addComponent(dtpTglAkhir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(cmdDisplay, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -1333,8 +1341,8 @@ public class frmTransaksi extends javax.swing.JInternalFrame {
 
     private void cmdAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdAddActionPerformed
         // TODO add your handling code here:
-        textMode(true);
         clrForm();
+        textMode(true);
         genDocNo();
         isAdd=true;
     }//GEN-LAST:event_cmdAddActionPerformed

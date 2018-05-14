@@ -33,6 +33,7 @@ public class frmMain extends javax.swing.JFrame {
     frmUser user = new frmUser();
     frmMember member = new frmMember();
     frmTransaksi transaksi = new frmTransaksi();
+    frmLaporan laporan = new frmLaporan();
 
     public frmMain() {
         this.setUndecorated(true); //set jframe without titlebar
@@ -276,6 +277,11 @@ public class frmMain extends javax.swing.JFrame {
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 cmdReportMouseExited(evt);
+            }
+        });
+        cmdReport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdReportActionPerformed(evt);
             }
         });
 
@@ -615,6 +621,7 @@ public class frmMain extends javax.swing.JFrame {
         showChildForm(transaksi);
     }//GEN-LAST:event_cmdTransActionPerformed
 
+<<<<<<< HEAD
     private void cmdChangePasswordMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cmdChangePasswordMouseEntered
         // TODO add your handling code here:
     }//GEN-LAST:event_cmdChangePasswordMouseEntered
@@ -626,6 +633,12 @@ public class frmMain extends javax.swing.JFrame {
     private void cmdChangePasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdChangePasswordActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_cmdChangePasswordActionPerformed
+=======
+    private void cmdReportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdReportActionPerformed
+        // TODO add your handling code here:
+        showChildForm(laporan);
+    }//GEN-LAST:event_cmdReportActionPerformed
+>>>>>>> f685218d0430953ec18ab86a24eeb99bbf7eba64
     
     /**
      * @param args the command line arguments
