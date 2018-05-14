@@ -84,6 +84,7 @@ public class frmMain extends javax.swing.JFrame {
         cmdTrans = new javax.swing.JButton();
         cmdReport = new javax.swing.JButton();
         cmdExit = new javax.swing.JButton();
+        cmdChangePassword = new javax.swing.JButton();
         pnlFooter = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         pnlChildForm = new javax.swing.JDesktopPane();
@@ -299,6 +300,27 @@ public class frmMain extends javax.swing.JFrame {
             }
         });
 
+        cmdChangePassword.setBackground(new java.awt.Color(255, 242, 157));
+        cmdChangePassword.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
+        cmdChangePassword.setIcon(new javax.swing.ImageIcon(getClass().getResource("/perpus/Img/shutdown-20 (2).png"))); // NOI18N
+        cmdChangePassword.setText("Ganti Password");
+        cmdChangePassword.setContentAreaFilled(false);
+        cmdChangePassword.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        cmdChangePassword.setIconTextGap(14);
+        cmdChangePassword.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                cmdChangePasswordMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                cmdChangePasswordMouseExited(evt);
+            }
+        });
+        cmdChangePassword.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdChangePasswordActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout pnlMenuLayout = new javax.swing.GroupLayout(pnlMenu);
         pnlMenu.setLayout(pnlMenuLayout);
         pnlMenuLayout.setHorizontalGroup(
@@ -310,7 +332,8 @@ public class frmMain extends javax.swing.JFrame {
                     .addComponent(cmdMaster, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(cmdTrans, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(cmdReport, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(cmdExit, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(cmdExit, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(cmdChangePassword, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(0, 0, Short.MAX_VALUE))
         );
         pnlMenuLayout.setVerticalGroup(
@@ -325,9 +348,11 @@ public class frmMain extends javax.swing.JFrame {
                 .addComponent(cmdTrans, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(cmdReport, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(45, 45, 45)
+                .addGap(62, 62, 62)
+                .addComponent(cmdChangePassword, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(cmdExit, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(23, 23, 23))
+                .addGap(75, 75, 75))
         );
 
         jScrollPane1.setViewportView(pnlMenu);
@@ -378,7 +403,7 @@ public class frmMain extends javax.swing.JFrame {
             .addGroup(pnlFormLayout.createSequentialGroup()
                 .addComponent(pnlTitle, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGroup(pnlFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1)
                     .addComponent(pnlChildForm))
                 .addComponent(pnlFooter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
@@ -403,12 +428,14 @@ public class frmMain extends javax.swing.JFrame {
     }
     
     public void showMasterUser() {
-        //frmUser frm = new frmUser();
+        if (cls.getPubUserLvl()==2) {
+            cls.showMsg("Anda tidak bisa mengakses menu ini.", "Hak Akses", 2);
+            return;
+        }
         showChildForm(user);
     }
     
     public void showMasterBuku() {
-        //frmBuku frm = new frmBuku();
         showChildForm(buku);
     }
     private void showChildForm(JInternalFrame frm) {
@@ -587,6 +614,18 @@ public class frmMain extends javax.swing.JFrame {
         // TODO add your handling code here:
         showChildForm(transaksi);
     }//GEN-LAST:event_cmdTransActionPerformed
+
+    private void cmdChangePasswordMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cmdChangePasswordMouseEntered
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cmdChangePasswordMouseEntered
+
+    private void cmdChangePasswordMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cmdChangePasswordMouseExited
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cmdChangePasswordMouseExited
+
+    private void cmdChangePasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdChangePasswordActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cmdChangePasswordActionPerformed
     
     /**
      * @param args the command line arguments
@@ -603,6 +642,7 @@ public class frmMain extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnLogo;
+    private javax.swing.JButton cmdChangePassword;
     private javax.swing.JButton cmdCloseForm;
     private javax.swing.JButton cmdExit;
     private javax.swing.JButton cmdHome;

@@ -7,6 +7,9 @@ package perpus;
 
 import java.awt.Image;
 import java.awt.Graphics;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JComponent;
 
 /**
@@ -18,10 +21,23 @@ public class frmHome extends javax.swing.JInternalFrame {
     /**
      * Creates new form frmHome
      */
+    clsFunctions cls = new clsFunctions();
     public frmHome() {
         initComponents();     
+        showReminder();
     }
     
+    private void showReminder() {
+        try {
+            cls.showTblGrid(tblReminder, "select p.no_dok as 'No. Dokumen', p.tgl_pinjam as 'Tgl Pinjam', "
+                    + "p.id_member as 'ID Member', m.nama as 'Nama Member', m.no_hp as 'No. HP', "
+                    + "p.jml_buku as 'Jml Buku', concat(datediff(p.tgl_pinjam,current_date) * -1,' hari') as 'Lama Pinjam' "
+                    + "from t_pinjam p join t_member m on m.id_member = p.id_member "
+                    + "where p.tgl_kembali is null");
+        } catch (SQLException ex) {
+            Logger.getLogger(frmHome.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
     class ImagePanel extends JComponent {
         private Image image;
         public ImagePanel(Image image) {
@@ -46,7 +62,7 @@ public class frmHome extends javax.swing.JInternalFrame {
         pnlForm = new javax.swing.JPanel();
         pnlReminderPinjam = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tblReminder = new javax.swing.JTable();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
@@ -59,7 +75,7 @@ public class frmHome extends javax.swing.JInternalFrame {
 
         pnlReminderPinjam.setBackground(new java.awt.Color(255, 255, 255));
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tblReminder.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -70,12 +86,12 @@ public class frmHome extends javax.swing.JInternalFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jTable1.setGridColor(new java.awt.Color(204, 204, 204));
-        jScrollPane1.setViewportView(jTable1);
+        tblReminder.setGridColor(new java.awt.Color(204, 204, 204));
+        jScrollPane1.setViewportView(tblReminder);
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("Pengingat Jatuh Tempo Pinjam Buku");
+        jLabel1.setText("Daftar Pinjam Buku yang Belum Dikembalikan");
 
         javax.swing.GroupLayout pnlReminderPinjamLayout = new javax.swing.GroupLayout(pnlReminderPinjam);
         pnlReminderPinjam.setLayout(pnlReminderPinjamLayout);
@@ -153,8 +169,8 @@ public class frmHome extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
     private javax.swing.JPanel pnlForm;
     private javax.swing.JPanel pnlReminderPinjam;
+    private javax.swing.JTable tblReminder;
     // End of variables declaration//GEN-END:variables
 }

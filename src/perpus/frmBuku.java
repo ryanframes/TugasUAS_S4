@@ -6,7 +6,10 @@
 package perpus;
 
 import java.awt.event.KeyEvent;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.TableColumnModel;
 
@@ -30,6 +33,21 @@ public class frmBuku extends javax.swing.JInternalFrame {
             cls.showMsg("Kode Buku harus di isi", "Simpan Gagal", 0);
             txtKodeBuku.grabFocus();
             return false;
+        }
+        if (txtKodeBuku.isEnabled()) { //validasi kode buku
+            try {
+                ResultSet rs = oConn.getData("select nm_buku from t_buku where " + 
+                    "kd_buku='"+ txtKodeBuku.getText().toString() +"'");
+                if (rs.next()) {
+                    cls.showMsg("Kode Buku [" + txtKodeBuku.getText().toString() + "] sudah "
+                            + "terdaftar dengan nama [" + rs.getString("nm_buku") + "]", "Simpan Gagal", 0);
+                }
+                rs.close();
+                txtKodeBuku.grabFocus();
+                return false;
+            } catch (SQLException ex) {
+                Logger.getLogger(frmBuku.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         if (txtNamaBuku.getText().equals("")) {
             cls.showMsg("Nama Buku harus di isi", "Simpan Gagal", 0);

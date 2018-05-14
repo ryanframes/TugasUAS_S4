@@ -6,10 +6,13 @@
 package perpus;
 
 import java.awt.event.KeyEvent;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.TableColumnModel;
 
@@ -43,6 +46,21 @@ public class frmMember extends javax.swing.JInternalFrame {
             cls.showMsg("ID Member harus di isi", "Simpan Gagal", 0);
             txtIDMember.grabFocus();
             return false;
+        }
+        if (txtIDMember.isEnabled()) { //validasi id member
+            try {
+                ResultSet rs = oConn.getData("select nama from t_member where " + 
+                    "id_member='"+ txtIDMember.getText().toString() +"'");
+                if (rs.next()) {
+                    cls.showMsg("ID Member [" + txtIDMember.getText().toString() + "] sudah "
+                            + "terdaftar dengan nama [" + rs.getString("nama") + "]", "Simpan Gagal", 0);
+                }
+                rs.close();
+                txtIDMember.grabFocus();
+                return false;
+            } catch (SQLException ex) {
+                Logger.getLogger(frmBuku.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         if (txtNama.getText().equals("")) {
             cls.showMsg("Nama Lengkap member harus di isi", "Simpan Gagal", 0);

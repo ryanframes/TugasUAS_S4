@@ -6,7 +6,10 @@
 package perpus;
 
 import java.awt.event.KeyEvent;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.TableColumnModel;
 
@@ -30,6 +33,21 @@ public class frmUser extends javax.swing.JInternalFrame {
             cls.showMsg("Nama User harus di isi", "Simpan Gagal", 0);
             txtUser.grabFocus();
             return false;
+        }
+        if (txtUser.isEnabled()) { //validasi id member
+            try {
+                ResultSet rs = oConn.getData("select nm_user from t_user where " + 
+                    "nm_user='"+ txtUser.getText().toString() +"'");
+                if (rs.next()) {
+                    cls.showMsg("Nama user [" + txtUser.getText().toString() + "] sudah "
+                            + "terdaftar", "Simpan Gagal", 0);
+                }
+                rs.close();
+                txtUser.grabFocus();
+                return false;
+            } catch (SQLException ex) {
+                Logger.getLogger(frmBuku.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         if (String.valueOf(txtPassword.getPassword()).equals("")) {
             cls.showMsg("Password User harus di isi", "Simpan Gagal", 0);
