@@ -745,7 +745,7 @@ public class frmMember extends javax.swing.JInternalFrame {
             cls.showTblGrid(tblBuku, "select id_member as 'ID Member', "
                 + "nama as 'Nama Lengkap', no_hp as 'No. HP', "
                 + "tgl_join as 'Tgl Bergabung', j_kelamin as 'Jenis Kelamin' from "
-                + "t_member where nama like '%" + txtCari.getText() + "%' and "
+                + "t_member where nama like '%" + txtCari.getText() + "%' or "
                 + "id_member like '%" + txtCari.getText() + "%'");
             tblBuku.setEditingColumn(0);
             tblBuku.setEditingRow(0);

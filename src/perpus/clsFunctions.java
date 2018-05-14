@@ -119,6 +119,13 @@ public class clsFunctions {
         String ret=formater.format(dtp.getDate());
         return ret;
     }
+    //overload getdateVal function
+    public String getDateVal(JXDatePicker dtp, String sDateFormat) {
+        Calendar cal=Calendar.getInstance();
+        SimpleDateFormat formater = new SimpleDateFormat(sDateFormat);
+        String ret=formater.format(dtp.getDate());
+        return ret;
+    }
     
     public void setDateVal(JXDatePicker dtp,Date vDate) {
         Calendar cal=Calendar.getInstance();

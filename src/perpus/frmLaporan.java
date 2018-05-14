@@ -5,68 +5,44 @@
  */
 package perpus;
 
-<<<<<<< HEAD
+import java.awt.Color;
+import java.awt.Font;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.border.TitledBorder;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.view.JasperViewer;
+
 
 /**
  *
  * @author MOZART-PC
  */
 public class frmLaporan extends javax.swing.JInternalFrame {
-=======
-import java.awt.Color;
-import java.awt.Font;
-import java.sql.SQLException;
-import java.time.LocalDate;
-import java.util.Date;
-import javax.swing.border.TitledBorder;
-
-/**
- *
- * @author ZSOFT_DEV
- */
-public class frmLaporan extends javax.swing.JInternalFrame {
-    clsConnection oConn = new clsConnection();
->>>>>>> f685218d0430953ec18ab86a24eeb99bbf7eba64
     clsFunctions cls = new clsFunctions();
+    clsConnection oConn = new clsConnection();
     /**
      * Creates new form frmLaporan
      */
     public frmLaporan() {
         initComponents();
         LocalDate today=LocalDate.now(); //first date of month
-<<<<<<< HEAD
-        cls.setDateVal(dtpTglAwal, java.sql.Date.valueOf(today.withDayOfMonth(1)));
-        cls.setDateVal(dtpTglAkhir, new Date());
+        cls.setDateVal(dtpAwal, java.sql.Date.valueOf(today.withDayOfMonth(1)));
+        cls.setDateVal(dtpAkhir, new Date());
         
         //make datepicker editable = false
-        dtpTglAkhir.getEditor().setEditable(false);
-        dtpTglAwal.getEditor().setEditable(false);
+        dtpAkhir.getEditor().setEditable(false);
+        dtpAwal.getEditor().setEditable(false);
         
         cmdDisplay.doClick();
     }
 
-    private void displayTrans() {
-        try {
-            cls.showTblGrid(tblTransaksi, "select no_dok as 'No. Dokumen', tgl_pinjam as 'Tgl Pinjam', "
-                    + "p.id_member as 'ID Member', m.nama as 'Nama Member', tgl_kembali as 'Tgl Kembali', "
-                    + "jml_buku as 'Jml. Buku' from t_pinjam p join t_member m on p.id_member = m.id_member "
-                    + "where tgl_pinjam between '" + cls.getDateVal(dtpTglAwal) + " 00:00:00' and "
-                    + "'" + cls.getDateVal(dtpTglAkhir) + " 23:59:59'");
-            tblTransaksi.setEditingColumn(0);
-            tblTransaksi.setEditingRow(0);
-            displayTransDet();
-=======
-        cls.setDateVal(dtpAwal, java.sql.Date.valueOf(today.withDayOfMonth(1)));
-        cls.setDateVal(dtpAkhir, new Date());
-        dtpAwal.getEditor().setEditable(false);
-        dtpAkhir.getEditor().setEditable(false);
-        
-        cmdDisplay1.doClick();
-    }
-    
     private void displayTrans() {
         try {
             cls.showTblGrid(tblHeader, "select no_dok as 'No. Dokumen', tgl_pinjam as 'Tgl Pinjam', "
@@ -77,31 +53,18 @@ public class frmLaporan extends javax.swing.JInternalFrame {
             tblHeader.setEditingColumn(0);
             tblHeader.setEditingRow(0);
             displayDet();
->>>>>>> f685218d0430953ec18ab86a24eeb99bbf7eba64
         } catch (SQLException ex) {
             cls.showMsg("Error saat menampilkan detail buku.","Tampil Data Buku", 2);
         }
     }
-<<<<<<< HEAD
-    
-    private void displayTransDet() {
-        String no_dok="";
-        if (tblTransaksi.getSelectedRow()>=0) {
-            no_dok=(String)tblTransaksi.getValueAt(tblTransaksi.getSelectedRow(), 0);
-        }
-        try {
-            cls.showTblGrid(tblDetail, "select d.kd_buku as 'Kode Buku', nm_buku as 'Nama Buku' "
-                    + "from t_pinjam_det d join t_buku b on b.kd_buku = d.kd_buku "
-                    + "where no_dok ='" + no_dok + "'");
-=======
-
+            
     private void displayDet() {
         String noDok = "";
         if (tblHeader.getSelectedRow()>=0) {
             noDok=(String) tblHeader.getValueAt(tblHeader.getSelectedRow(), 0);
         }
         try {
-            Font fn=new Font(pnlHeader.getFont().getFontName(), pnlHeader.getFont().getStyle(), pnlHeader.getFont().getSize());
+            Font fn=new Font(jLabel4.getFont().getFontName(), jLabel4.getFont().getStyle(), jLabel4.getFont().getSize());
             TitledBorder border = new TitledBorder("Detail Dokumen : " + noDok);
             border.setTitleColor(Color.white);
             border.setTitleFont(fn);
@@ -109,15 +72,28 @@ public class frmLaporan extends javax.swing.JInternalFrame {
             cls.showTblGrid(tblDetail, "select d.kd_buku as 'Kode Buku', nm_buku as 'Nama Buku' "
                     + "from t_pinjam_det d join t_buku b on b.kd_buku = d.kd_buku "
                     + "where no_dok ='" + noDok + "'");
->>>>>>> f685218d0430953ec18ab86a24eeb99bbf7eba64
         } catch (SQLException ex) {
             cls.showMsg("Error saat menampilkan detail buku.","Tampil Data Buku", 2);
         }
     }
-<<<<<<< HEAD
-=======
-            
->>>>>>> f685218d0430953ec18ab86a24eeb99bbf7eba64
+    
+    private void printReport() {
+        try {
+            String periode="Periode : " + cls.getDateVal(dtpAwal,"dd MMM yyyy") + 
+                " s/d " + cls.getDateVal(dtpAkhir, "dd MMM yyyy");
+            String tgl_awal = cls.getDateVal(dtpAwal);
+            String tgl_akhir = cls.getDateVal(dtpAkhir);
+            String fName = "src/perpus/rptLaporan.jasper";
+            HashMap param = new HashMap();
+            param.put("headerPeriode", periode);
+            param.put("tgl_awal", tgl_awal);
+            param.put("tgl_akhir", tgl_akhir);
+            JasperPrint print = JasperFillManager.fillReport(fName, param, oConn.getDbCon());
+            JasperViewer.viewReport(print,false);
+        } catch (JRException ex) {
+            Logger.getLogger(frmLaporan.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -127,116 +103,34 @@ public class frmLaporan extends javax.swing.JInternalFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-<<<<<<< HEAD
         pnlForm = new javax.swing.JPanel();
         pnlTitle = new javax.swing.JPanel();
         lblTitle = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        tblTransaksi = new javax.swing.JTable();
+        tblHeader = new javax.swing.JTable();
         jPanel3 = new javax.swing.JPanel();
         cmdDisplay = new javax.swing.JButton();
         jLabel6 = new javax.swing.JLabel();
-        dtpTglAwal = new org.jdesktop.swingx.JXDatePicker();
+        dtpAwal = new org.jdesktop.swingx.JXDatePicker();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
-        dtpTglAkhir = new org.jdesktop.swingx.JXDatePicker();
+        dtpAkhir = new org.jdesktop.swingx.JXDatePicker();
         pnlDetail = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         tblDetail = new javax.swing.JTable();
+        pnlBottom = new javax.swing.JPanel();
+        cmdPrint = new javax.swing.JButton();
+        cmdClose = new javax.swing.JButton();
 
         setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
 
         pnlForm.setBackground(new java.awt.Color(30, 144, 255));
-=======
-        bg = new javax.swing.JPanel();
-        pnlBottom = new javax.swing.JPanel();
-        cmdClose = new javax.swing.JButton();
-        cmdPrint = new javax.swing.JButton();
-        pnlTitle = new javax.swing.JPanel();
-        lblTitle = new javax.swing.JLabel();
-        pnlFilter = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        dtpAwal = new org.jdesktop.swingx.JXDatePicker();
-        dtpAkhir = new org.jdesktop.swingx.JXDatePicker();
-        jLabel4 = new javax.swing.JLabel();
-        cmdDisplay1 = new javax.swing.JButton();
-        pnlHeader = new javax.swing.JPanel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        tblHeader = new javax.swing.JTable();
-        pnlDetail = new javax.swing.JPanel();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        tblDetail = new javax.swing.JTable();
-
-        setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
-        setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
-
-        bg.setBackground(new java.awt.Color(27, 161, 226));
-
-        pnlBottom.setBackground(new java.awt.Color(255, 255, 255));
-        pnlBottom.setPreferredSize(new java.awt.Dimension(803, 50));
-        pnlBottom.setLayout(null);
-
-        cmdClose.setBackground(new java.awt.Color(255, 242, 157));
-        cmdClose.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
-        cmdClose.setIcon(new javax.swing.ImageIcon(getClass().getResource("/perpus/Img/Door Opened_16px.png"))); // NOI18N
-        cmdClose.setText("Keluar");
-        cmdClose.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.RAISED, new java.awt.Color(51, 51, 51), new java.awt.Color(51, 51, 51)));
-        cmdClose.setContentAreaFilled(false);
-        cmdClose.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        cmdClose.setMaximumSize(new java.awt.Dimension(87, 27));
-        cmdClose.setMinimumSize(new java.awt.Dimension(87, 27));
-        cmdClose.setPreferredSize(new java.awt.Dimension(87, 27));
-        cmdClose.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                cmdCloseMouseEntered(evt);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                cmdCloseMouseExited(evt);
-            }
-        });
-        cmdClose.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdCloseActionPerformed(evt);
-            }
-        });
-        pnlBottom.add(cmdClose);
-        cmdClose.setBounds(100, 10, 87, 27);
-
-        cmdPrint.setBackground(new java.awt.Color(255, 242, 157));
-        cmdPrint.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
-        cmdPrint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/perpus/Img/printer_16.png"))); // NOI18N
-        cmdPrint.setText("Cetak");
-        cmdPrint.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.RAISED, new java.awt.Color(51, 51, 51), new java.awt.Color(51, 51, 51)));
-        cmdPrint.setContentAreaFilled(false);
-        cmdPrint.setMaximumSize(new java.awt.Dimension(87, 27));
-        cmdPrint.setMinimumSize(new java.awt.Dimension(87, 27));
-        cmdPrint.setPreferredSize(new java.awt.Dimension(87, 27));
-        cmdPrint.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                cmdPrintMouseEntered(evt);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                cmdPrintMouseExited(evt);
-            }
-        });
-        cmdPrint.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdPrintActionPerformed(evt);
-            }
-        });
-        pnlBottom.add(cmdPrint);
-        cmdPrint.setBounds(10, 10, 87, 27);
->>>>>>> f685218d0430953ec18ab86a24eeb99bbf7eba64
 
         pnlTitle.setBackground(new java.awt.Color(255, 255, 255));
 
         lblTitle.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         lblTitle.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-<<<<<<< HEAD
         lblTitle.setText("Laporan Pinjam Buku");
-=======
-        lblTitle.setText("Transaksi Pinjam Buku");
->>>>>>> f685218d0430953ec18ab86a24eeb99bbf7eba64
         lblTitle.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             public void mouseDragged(java.awt.event.MouseEvent evt) {
                 lblTitleMouseDragged(evt);
@@ -261,8 +155,7 @@ public class frmLaporan extends javax.swing.JInternalFrame {
             .addComponent(lblTitle, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 43, Short.MAX_VALUE)
         );
 
-<<<<<<< HEAD
-        tblTransaksi.setModel(new javax.swing.table.DefaultTableModel(
+        tblHeader.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -273,12 +166,12 @@ public class frmLaporan extends javax.swing.JInternalFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        tblTransaksi.addMouseListener(new java.awt.event.MouseAdapter() {
+        tblHeader.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                tblTransaksiMouseClicked(evt);
+                tblHeaderMouseClicked(evt);
             }
         });
-        jScrollPane1.setViewportView(tblTransaksi);
+        jScrollPane1.setViewportView(tblHeader);
 
         jPanel3.setBackground(new java.awt.Color(255, 255, 255));
         jPanel3.setPreferredSize(new java.awt.Dimension(639, 55));
@@ -326,11 +219,11 @@ public class frmLaporan extends javax.swing.JInternalFrame {
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(15, 15, 15)
-                        .addComponent(dtpTglAwal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(dtpAwal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(15, 15, 15)
                         .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(15, 15, 15)
-                        .addComponent(dtpTglAkhir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(dtpAkhir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(cmdDisplay, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -344,124 +237,14 @@ public class frmLaporan extends javax.swing.JInternalFrame {
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cmdDisplay, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel4)
-                    .addComponent(dtpTglAwal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(dtpAwal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel5)
-                    .addComponent(dtpTglAkhir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(dtpAkhir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
         pnlDetail.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Detail Dokumen Pinjam Buku", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 0, 11), new java.awt.Color(255, 255, 255))); // NOI18N
         pnlDetail.setForeground(new java.awt.Color(255, 255, 255));
-=======
-        pnlFilter.setBackground(new java.awt.Color(27, 161, 226));
-        pnlFilter.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Periode Laporan", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 0, 11), new java.awt.Color(255, 255, 255))); // NOI18N
-        pnlFilter.setForeground(new java.awt.Color(255, 255, 255));
-        pnlFilter.setOpaque(false);
-
-        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel1.setText("Dari");
-
-        jLabel4.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel4.setText("Sampai");
-
-        cmdDisplay1.setBackground(new java.awt.Color(255, 255, 255));
-        cmdDisplay1.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
-        cmdDisplay1.setText("Tampilkan Data");
-        cmdDisplay1.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.RAISED, new java.awt.Color(51, 51, 51), new java.awt.Color(51, 51, 51)));
-        cmdDisplay1.setContentAreaFilled(false);
-        cmdDisplay1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        cmdDisplay1.setMaximumSize(new java.awt.Dimension(87, 21));
-        cmdDisplay1.setMinimumSize(new java.awt.Dimension(87, 21));
-        cmdDisplay1.setOpaque(true);
-        cmdDisplay1.setPreferredSize(new java.awt.Dimension(87, 21));
-        cmdDisplay1.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                cmdDisplay1MouseEntered(evt);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                cmdDisplay1MouseExited(evt);
-            }
-        });
-        cmdDisplay1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdDisplay1ActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout pnlFilterLayout = new javax.swing.GroupLayout(pnlFilter);
-        pnlFilter.setLayout(pnlFilterLayout);
-        pnlFilterLayout.setHorizontalGroup(
-            pnlFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlFilterLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(dtpAwal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel4)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(dtpAkhir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cmdDisplay1, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        pnlFilterLayout.setVerticalGroup(
-            pnlFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlFilterLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnlFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(dtpAwal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(dtpAkhir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel4)
-                    .addComponent(cmdDisplay1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap())
-        );
-
-        pnlHeader.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Daftar Dokumen Pinjam Buku", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 11), new java.awt.Color(255, 255, 255))); // NOI18N
-        pnlHeader.setOpaque(false);
-
-        tblHeader.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        tblHeader.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                tblHeaderMouseClicked(evt);
-            }
-        });
-        jScrollPane1.setViewportView(tblHeader);
-
-        javax.swing.GroupLayout pnlHeaderLayout = new javax.swing.GroupLayout(pnlHeader);
-        pnlHeader.setLayout(pnlHeaderLayout);
-        pnlHeaderLayout.setHorizontalGroup(
-            pnlHeaderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-            .addGroup(pnlHeaderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(pnlHeaderLayout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 763, Short.MAX_VALUE)
-                    .addContainerGap()))
-        );
-        pnlHeaderLayout.setVerticalGroup(
-            pnlHeaderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 155, Short.MAX_VALUE)
-            .addGroup(pnlHeaderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(pnlHeaderLayout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 133, Short.MAX_VALUE)
-                    .addContainerGap()))
-        );
-
-        pnlDetail.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Detail Dokumen Pinjam Buku", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 11), new java.awt.Color(255, 255, 255))); // NOI18N
->>>>>>> f685218d0430953ec18ab86a24eeb99bbf7eba64
         pnlDetail.setOpaque(false);
 
         tblDetail.setModel(new javax.swing.table.DefaultTableModel(
@@ -475,22 +258,88 @@ public class frmLaporan extends javax.swing.JInternalFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-<<<<<<< HEAD
         jScrollPane3.setViewportView(tblDetail);
-=======
-        jScrollPane2.setViewportView(tblDetail);
->>>>>>> f685218d0430953ec18ab86a24eeb99bbf7eba64
 
         javax.swing.GroupLayout pnlDetailLayout = new javax.swing.GroupLayout(pnlDetail);
         pnlDetail.setLayout(pnlDetailLayout);
         pnlDetailLayout.setHorizontalGroup(
             pnlDetailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-<<<<<<< HEAD
             .addComponent(jScrollPane3)
         );
         pnlDetailLayout.setVerticalGroup(
             pnlDetailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 149, Short.MAX_VALUE)
+        );
+
+        pnlBottom.setBackground(new java.awt.Color(255, 255, 255));
+        pnlBottom.setPreferredSize(new java.awt.Dimension(100, 55));
+
+        cmdPrint.setBackground(new java.awt.Color(255, 242, 157));
+        cmdPrint.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
+        cmdPrint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/perpus/Img/printer_16.png"))); // NOI18N
+        cmdPrint.setText("Cetak");
+        cmdPrint.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.RAISED, new java.awt.Color(51, 51, 51), new java.awt.Color(51, 51, 51)));
+        cmdPrint.setContentAreaFilled(false);
+        cmdPrint.setMaximumSize(new java.awt.Dimension(87, 27));
+        cmdPrint.setMinimumSize(new java.awt.Dimension(87, 27));
+        cmdPrint.setPreferredSize(new java.awt.Dimension(87, 27));
+        cmdPrint.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                cmdPrintMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                cmdPrintMouseExited(evt);
+            }
+        });
+        cmdPrint.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdPrintActionPerformed(evt);
+            }
+        });
+
+        cmdClose.setBackground(new java.awt.Color(255, 242, 157));
+        cmdClose.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
+        cmdClose.setIcon(new javax.swing.ImageIcon(getClass().getResource("/perpus/Img/Door Opened_16px.png"))); // NOI18N
+        cmdClose.setText("Keluar");
+        cmdClose.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.RAISED, new java.awt.Color(51, 51, 51), new java.awt.Color(51, 51, 51)));
+        cmdClose.setContentAreaFilled(false);
+        cmdClose.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        cmdClose.setMaximumSize(new java.awt.Dimension(87, 27));
+        cmdClose.setMinimumSize(new java.awt.Dimension(87, 27));
+        cmdClose.setPreferredSize(new java.awt.Dimension(87, 27));
+        cmdClose.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                cmdCloseMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                cmdCloseMouseExited(evt);
+            }
+        });
+        cmdClose.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdCloseActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout pnlBottomLayout = new javax.swing.GroupLayout(pnlBottom);
+        pnlBottom.setLayout(pnlBottomLayout);
+        pnlBottomLayout.setHorizontalGroup(
+            pnlBottomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlBottomLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(cmdPrint, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(3, 3, 3)
+                .addComponent(cmdClose, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        pnlBottomLayout.setVerticalGroup(
+            pnlBottomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlBottomLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnlBottomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(cmdPrint, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cmdClose, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout pnlFormLayout = new javax.swing.GroupLayout(pnlForm);
@@ -505,6 +354,7 @@ public class frmLaporan extends javax.swing.JInternalFrame {
                     .addComponent(jScrollPane1)
                     .addComponent(pnlDetail, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
+            .addComponent(pnlBottom, javax.swing.GroupLayout.DEFAULT_SIZE, 801, Short.MAX_VALUE)
         );
         pnlFormLayout.setVerticalGroup(
             pnlFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -513,119 +363,28 @@ public class frmLaporan extends javax.swing.JInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(9, 9, 9)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(10, 10, 10)
                 .addComponent(pnlDetail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
-=======
-            .addGap(0, 0, Short.MAX_VALUE)
-            .addGroup(pnlDetailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(pnlDetailLayout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 763, Short.MAX_VALUE)
-                    .addContainerGap()))
-        );
-        pnlDetailLayout.setVerticalGroup(
-            pnlDetailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 177, Short.MAX_VALUE)
-            .addGroup(pnlDetailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(pnlDetailLayout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-        );
-
-        javax.swing.GroupLayout bgLayout = new javax.swing.GroupLayout(bg);
-        bg.setLayout(bgLayout);
-        bgLayout.setHorizontalGroup(
-            bgLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(pnlBottom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(pnlTitle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, bgLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(bgLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(pnlDetail, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(pnlHeader, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(pnlFilter, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
-        );
-        bgLayout.setVerticalGroup(
-            bgLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(bgLayout.createSequentialGroup()
-                .addComponent(pnlTitle, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(pnlFilter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnlHeader, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(10, 10, 10)
-                .addComponent(pnlDetail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(pnlBottom, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE))
->>>>>>> f685218d0430953ec18ab86a24eeb99bbf7eba64
+                .addComponent(pnlBottom, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(17, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-<<<<<<< HEAD
             .addComponent(pnlForm, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(pnlForm, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-=======
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(bg, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(0, 0, 0))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(bg, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
->>>>>>> f685218d0430953ec18ab86a24eeb99bbf7eba64
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-<<<<<<< HEAD
-=======
-    private void cmdCloseMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cmdCloseMouseEntered
-        // TODO add your handling code here:
-        cmdClose.setOpaque(true);
-    }//GEN-LAST:event_cmdCloseMouseEntered
-
-    private void cmdCloseMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cmdCloseMouseExited
-        // TODO add your handling code here:
-        cmdClose.setOpaque(false);
-    }//GEN-LAST:event_cmdCloseMouseExited
-
-    private void cmdCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdCloseActionPerformed
-        // TODO add your handling code here:
-        this.dispose();
-    }//GEN-LAST:event_cmdCloseActionPerformed
-
-    private void cmdPrintMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cmdPrintMouseEntered
-        // TODO add your handling code here:
-        cmdPrint.setOpaque(true);
-    }//GEN-LAST:event_cmdPrintMouseEntered
-
-    private void cmdPrintMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cmdPrintMouseExited
-        // TODO add your handling code here:
-        cmdPrint.setOpaque(false);
-    }//GEN-LAST:event_cmdPrintMouseExited
-
-    private void cmdPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdPrintActionPerformed
-        // TODO add your handling code here:
-        
-    }//GEN-LAST:event_cmdPrintActionPerformed
-
-    private void tblHeaderMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblHeaderMouseClicked
-        // TODO add your handling code here:
-        displayDet();
-    }//GEN-LAST:event_tblHeaderMouseClicked
-
->>>>>>> f685218d0430953ec18ab86a24eeb99bbf7eba64
     private void lblTitleMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblTitleMouseDragged
 
     }//GEN-LAST:event_lblTitleMouseDragged
@@ -634,11 +393,10 @@ public class frmLaporan extends javax.swing.JInternalFrame {
 
     }//GEN-LAST:event_lblTitleMousePressed
 
-<<<<<<< HEAD
-    private void tblTransaksiMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblTransaksiMouseClicked
+    private void tblHeaderMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblHeaderMouseClicked
         // TODO add your handling code here:
-        displayTrans();
-    }//GEN-LAST:event_tblTransaksiMouseClicked
+        displayDet();
+    }//GEN-LAST:event_tblHeaderMouseClicked
 
     private void cmdDisplayMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cmdDisplayMouseEntered
         // TODO add your handling code here:
@@ -654,11 +412,42 @@ public class frmLaporan extends javax.swing.JInternalFrame {
         displayTrans();
     }//GEN-LAST:event_cmdDisplayActionPerformed
 
+    private void cmdPrintMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cmdPrintMouseEntered
+        // TODO add your handling code here:
+        cmdPrint.setOpaque(true);
+    }//GEN-LAST:event_cmdPrintMouseEntered
+
+    private void cmdPrintMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cmdPrintMouseExited
+        // TODO add your handling code here:
+        cmdPrint.setOpaque(false);
+    }//GEN-LAST:event_cmdPrintMouseExited
+
+    private void cmdPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdPrintActionPerformed
+        printReport();
+    }//GEN-LAST:event_cmdPrintActionPerformed
+
+    private void cmdCloseMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cmdCloseMouseEntered
+        // TODO add your handling code here:
+        cmdClose.setOpaque(true);
+    }//GEN-LAST:event_cmdCloseMouseEntered
+
+    private void cmdCloseMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cmdCloseMouseExited
+        // TODO add your handling code here:
+        cmdClose.setOpaque(false);
+    }//GEN-LAST:event_cmdCloseMouseExited
+
+    private void cmdCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdCloseActionPerformed
+        // TODO add your handling code here:
+        this.dispose();
+    }//GEN-LAST:event_cmdCloseActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton cmdClose;
     private javax.swing.JButton cmdDisplay;
-    private org.jdesktop.swingx.JXDatePicker dtpTglAkhir;
-    private org.jdesktop.swingx.JXDatePicker dtpTglAwal;
+    private javax.swing.JButton cmdPrint;
+    private org.jdesktop.swingx.JXDatePicker dtpAkhir;
+    private org.jdesktop.swingx.JXDatePicker dtpAwal;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
@@ -666,57 +455,12 @@ public class frmLaporan extends javax.swing.JInternalFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JLabel lblTitle;
+    private javax.swing.JPanel pnlBottom;
     private javax.swing.JPanel pnlDetail;
     private javax.swing.JPanel pnlForm;
     private javax.swing.JPanel pnlTitle;
     private javax.swing.JTable tblDetail;
-    private javax.swing.JTable tblTransaksi;
-    // End of variables declaration//GEN-END:variables
-=======
-    private void cmdDisplay1MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cmdDisplay1MouseEntered
-        // TODO add your handling code here:
-        cmdDisplay1.setBackground(new Color(255,242,157));
-    }//GEN-LAST:event_cmdDisplay1MouseEntered
-
-    private void cmdDisplay1MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cmdDisplay1MouseExited
-        // TODO add your handling code here:
-        cmdDisplay1.setBackground(Color.white);
-    }//GEN-LAST:event_cmdDisplay1MouseExited
-
-    private void cmdDisplay1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdDisplay1ActionPerformed
-        displayTrans();
-    }//GEN-LAST:event_cmdDisplay1ActionPerformed
-
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel bg;
-    private javax.swing.JButton cmdClose;
-    private javax.swing.JButton cmdDisplay;
-    private javax.swing.JButton cmdDisplay1;
-    private javax.swing.JButton cmdPrint;
-    private org.jdesktop.swingx.JXDatePicker dtpAkhir;
-    private org.jdesktop.swingx.JXDatePicker dtpAwal;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
-    private javax.swing.JPanel jPanel4;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JLabel lblTitle;
-    private javax.swing.JPanel pnlBottom;
-    private javax.swing.JPanel pnlDetail;
-    private javax.swing.JPanel pnlFilter;
-    private javax.swing.JPanel pnlHeader;
-    private javax.swing.JPanel pnlTitle;
-    private javax.swing.JTable tblDetail;
     private javax.swing.JTable tblHeader;
-    private javax.swing.JFormattedTextField txtDari;
-    private javax.swing.JFormattedTextField txtSampai;
     // End of variables declaration//GEN-END:variables
 
-    
->>>>>>> f685218d0430953ec18ab86a24eeb99bbf7eba64
 }

@@ -34,6 +34,20 @@ public class clsConnection {
         }
         return (con!=null);
     }
+    
+    public Connection getDbCon() {
+        if (con == null) {
+            try {
+                Class.forName("com.mysql.jdbc.Driver");
+                con =DriverManager.getConnection("jdbc:mysql://"+ serverIP +":"+ 
+                    serverPort +"/" + serverDB, serverUser, serverPass);
+            } catch (ClassNotFoundException | SQLException ex) {
+                ex.getMessage();
+            }
+        }
+        return con;
+    }
+    
     // Send data TO Database
     public void setData(String sql) throws SQLException {
         try {
