@@ -27,7 +27,7 @@ public class frmHome extends javax.swing.JInternalFrame {
         showReminder();
     }
     
-    private void showReminder() {
+    public void showReminder() {
         try {
             cls.showTblGrid(tblReminder, "select p.no_dok as 'No. Dokumen', p.tgl_pinjam as 'Tgl Pinjam', "
                     + "p.id_member as 'ID Member', m.nama as 'Nama Member', m.no_hp as 'No. HP', "

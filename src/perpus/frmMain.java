@@ -5,12 +5,19 @@
  */
 package perpus;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dialog;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Frame;
 import static java.awt.Frame.MAXIMIZED_BOTH;
 import java.awt.GraphicsConfiguration;
 import java.awt.Rectangle;
+import javax.swing.JDialog;
 import javax.swing.JInternalFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
 import javax.swing.plaf.basic.BasicInternalFrameUI;
@@ -308,7 +315,7 @@ public class frmMain extends javax.swing.JFrame {
 
         cmdChangePassword.setBackground(new java.awt.Color(255, 242, 157));
         cmdChangePassword.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
-        cmdChangePassword.setIcon(new javax.swing.ImageIcon(getClass().getResource("/perpus/Img/shutdown-20 (2).png"))); // NOI18N
+        cmdChangePassword.setIcon(new javax.swing.ImageIcon(getClass().getResource("/perpus/Img/key-20.png"))); // NOI18N
         cmdChangePassword.setText("Ganti Password");
         cmdChangePassword.setContentAreaFilled(false);
         cmdChangePassword.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
@@ -368,7 +375,7 @@ public class frmMain extends javax.swing.JFrame {
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("Copyright © 2018 Kelompok 3 PVII AMIK BSI. All Rights Reserved");
+        jLabel1.setText("Copyright © 2018 Kelompok 3 12 MI 4D PVII AMIK BSI Kaliabang Bekasi.");
         jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
         javax.swing.GroupLayout pnlFooterLayout = new javax.swing.GroupLayout(pnlFooter);
@@ -559,6 +566,7 @@ public class frmMain extends javax.swing.JFrame {
     private void cmdHomeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdHomeActionPerformed
         //frmHome home = new frmHome();
         showChildForm(home);
+        home.showReminder();
     }//GEN-LAST:event_cmdHomeActionPerformed
 
     private void cmdHomeMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cmdHomeMouseExited
@@ -624,14 +632,21 @@ public class frmMain extends javax.swing.JFrame {
 
     private void cmdChangePasswordMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cmdChangePasswordMouseEntered
         // TODO add your handling code here:
+        cmdChangePassword.setOpaque(true);
     }//GEN-LAST:event_cmdChangePasswordMouseEntered
 
     private void cmdChangePasswordMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cmdChangePasswordMouseExited
         // TODO add your handling code here:
+        cmdChangePassword.setOpaque(false);
     }//GEN-LAST:event_cmdChangePasswordMouseExited
 
     private void cmdChangePasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdChangePasswordActionPerformed
         // TODO add your handling code here:
+        frmChgPass pass = new frmChgPass(this,true);
+        //frmChangePass pass = new frmChangePass();
+        pass.pack();
+        pass.setLocationRelativeTo(null);
+        pass.setVisible(true);
     }//GEN-LAST:event_cmdChangePasswordActionPerformed
 
     private void cmdReportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdReportActionPerformed

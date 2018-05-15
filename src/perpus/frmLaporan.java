@@ -83,7 +83,7 @@ public class frmLaporan extends javax.swing.JInternalFrame {
                 " s/d " + cls.getDateVal(dtpAkhir, "dd MMM yyyy");
             String tgl_awal = cls.getDateVal(dtpAwal);
             String tgl_akhir = cls.getDateVal(dtpAkhir);
-            String fName = "src/perpus/rptLaporan.jasper";
+            String fName = "src/perpus/rptLaporanPinjam.jasper";
             HashMap param = new HashMap();
             param.put("headerPeriode", periode);
             param.put("tgl_awal", tgl_awal);

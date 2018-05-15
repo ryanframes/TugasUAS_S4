@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="null" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
-	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.zoom" value="1.3636363636363635"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="0"/>
+	<property name="ireport.y" value="38"/>
 	<parameter name="headerPeriode" class="java.lang.String">
 		<defaultValueExpression><![CDATA["Periode : xx s/d xx"]]></defaultValueExpression>
 	</parameter>
@@ -10,7 +10,7 @@
 		<defaultValueExpression><![CDATA["2018-01-01 00:00:00"]]></defaultValueExpression>
 	</parameter>
 	<parameter name="tgl_akhir" class="java.lang.String">
-		<defaultValueExpression><![CDATA["2018-05-30 23:59:59"]]></defaultValueExpression>
+		<defaultValueExpression><![CDATA["2018-05-31 23:59:59"]]></defaultValueExpression>
 	</parameter>
 	<queryString>
 		<![CDATA[select p.no_dok, p.tgl_pinjam, p.id_member,
@@ -21,125 +21,101 @@ join t_pinjam_det d on d.no_dok = p.no_dok
 join t_buku b on b.kd_buku = d.kd_buku
 where p.tgl_pinjam between $P{tgl_awal} and $P{tgl_akhir}]]>
 	</queryString>
-	<field name="no_dok" class="java.lang.String">
-		<fieldDescription><![CDATA[Contoh penomoran : 0001/PB/18 (PB = Pinjam Buku)]]></fieldDescription>
-	</field>
-	<field name="tgl_pinjam" class="java.sql.Date">
-		<fieldDescription><![CDATA[]]></fieldDescription>
-	</field>
-	<field name="id_member" class="java.lang.Integer">
-		<fieldDescription><![CDATA[]]></fieldDescription>
-	</field>
-	<field name="nama" class="java.lang.String">
-		<fieldDescription><![CDATA[]]></fieldDescription>
-	</field>
-	<field name="no_hp" class="java.lang.String">
-		<fieldDescription><![CDATA[]]></fieldDescription>
-	</field>
-	<field name="jml_buku" class="java.lang.Integer">
-		<fieldDescription><![CDATA[]]></fieldDescription>
-	</field>
+	<field name="no_dok" class="java.lang.String"/>
+	<field name="tgl_pinjam" class="java.sql.Date"/>
+	<field name="id_member" class="java.lang.Integer"/>
+	<field name="nama" class="java.lang.String"/>
+	<field name="no_hp" class="java.lang.String"/>
+	<field name="jml_buku" class="java.lang.Integer"/>
 	<field name="lama_pinjam" class="java.lang.String"/>
-	<field name="kd_buku" class="java.lang.String">
-		<fieldDescription><![CDATA[]]></fieldDescription>
-	</field>
-	<field name="tgl_kembali" class="java.sql.Date">
-		<fieldDescription><![CDATA[]]></fieldDescription>
-	</field>
-	<field name="nm_buku" class="java.lang.String">
-		<fieldDescription><![CDATA[]]></fieldDescription>
-	</field>
-	<field name="th_penerbit" class="java.lang.Integer">
-		<fieldDescription><![CDATA[]]></fieldDescription>
-	</field>
-	<field name="nm_penerbit" class="java.lang.String">
-		<fieldDescription><![CDATA[]]></fieldDescription>
-	</field>
-	<variable name="variable1" class="java.lang.String"/>
-	<group name="group_dok">
+	<field name="kd_buku" class="java.lang.String"/>
+	<field name="tgl_kembali" class="java.sql.Date"/>
+	<field name="nm_buku" class="java.lang.String"/>
+	<field name="th_penerbit" class="java.lang.Integer"/>
+	<field name="nm_penerbit" class="java.lang.String"/>
+	<variable name="REPORT_PAGE" class="java.lang.Integer" incrementType="Page">
+		<variableExpression><![CDATA[$V{PAGE_NUMBER}]]></variableExpression>
+	</variable>
+	<group name="no_dok">
+		<groupExpression><![CDATA[$F{no_dok}]]></groupExpression>
+	</group>
+	<group name="dok">
 		<groupExpression><![CDATA[$F{no_dok}]]></groupExpression>
 		<groupHeader>
-			<band height="18">
-				<textField>
-					<reportElement x="495" y="0" width="53" height="12"/>
-					<textElement textAlignment="Center">
-						<font fontName="Segoe UI" size="9"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$F{lama_pinjam}]]></textFieldExpression>
-				</textField>
-				<textField>
-					<reportElement x="22" y="0" width="68" height="12"/>
-					<textElement>
-						<font fontName="Segoe UI" size="9"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$F{no_dok}]]></textFieldExpression>
-				</textField>
+			<band height="19">
 				<textField pattern="dd-MMM-yy">
-					<reportElement x="93" y="0" width="59" height="12"/>
+					<reportElement x="95" y="3" width="59" height="12"/>
 					<textElement>
 						<font fontName="Segoe UI" size="9"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$F{tgl_pinjam}]]></textFieldExpression>
 				</textField>
 				<textField>
-					<reportElement x="155" y="0" width="70" height="12"/>
+					<reportElement x="24" y="3" width="68" height="12"/>
 					<textElement>
 						<font fontName="Segoe UI" size="9"/>
 					</textElement>
-					<textFieldExpression><![CDATA[$F{id_member}]]></textFieldExpression>
+					<textFieldExpression><![CDATA[$F{no_dok}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="0" y="15" width="555" height="1"/>
+				</line>
+				<textField pattern="dd-MMM-yy" isBlankWhenNull="true">
+					<reportElement x="358" y="3" width="64" height="12"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Segoe UI" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{tgl_kembali}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="497" y="3" width="53" height="12"/>
+					<textElement textAlignment="Center">
+						<font fontName="Segoe UI" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{lama_pinjam}]]></textFieldExpression>
+				</textField>
+				<textField pattern="###0">
+					<reportElement x="2" y="3" width="22" height="12"/>
+					<textElement>
+						<font fontName="Segoe UI" size="9" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{REPORT_COUNT}+1]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true">
-					<reportElement x="229" y="0" width="124" height="12"/>
+					<reportElement x="231" y="3" width="124" height="12"/>
 					<textElement>
 						<font fontName="Segoe UI" size="9"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$F{nama}]]></textFieldExpression>
 				</textField>
 				<textField>
-					<reportElement x="423" y="0" width="69" height="12"/>
+					<reportElement x="157" y="3" width="70" height="12"/>
+					<textElement>
+						<font fontName="Segoe UI" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{id_member}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="425" y="3" width="69" height="12"/>
 					<textElement>
 						<font fontName="Segoe UI" size="8"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$F{no_hp}]]></textFieldExpression>
 				</textField>
-				<line>
-					<reportElement x="0" y="13" width="555" height="1"/>
-				</line>
-				<textField pattern="dd-MMM-yy" isBlankWhenNull="true">
-					<reportElement x="356" y="0" width="64" height="12"/>
-					<textElement verticalAlignment="Middle">
-						<font fontName="Segoe UI" size="9"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$F{tgl_kembali}]]></textFieldExpression>
-				</textField>
-				<textField pattern="###0">
-					<reportElement x="0" y="0" width="22" height="12"/>
-					<textElement>
-						<font fontName="Segoe UI" size="9" isBold="false"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$V{REPORT_COUNT}+1]]></textFieldExpression>
-				</textField>
 			</band>
 		</groupHeader>
+		<groupFooter>
+			<band height="8"/>
+		</groupFooter>
 	</group>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
-	<title>
-		<band height="6" splitType="Stretch"/>
-	</title>
 	<pageHeader>
-		<band height="45" splitType="Stretch">
+		<band height="48" splitType="Stretch">
 			<rectangle>
 				<reportElement x="0" y="0" width="555" height="34"/>
 			</rectangle>
-			<staticText>
-				<reportElement x="0" y="0" width="555" height="20"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Segoe UI" isBold="true"/>
-				</textElement>
-				<text><![CDATA[LAPORAN PINJAM BUKUs]]></text>
-			</staticText>
 			<textField>
 				<reportElement x="0" y="20" width="555" height="14"/>
 				<box>
@@ -150,114 +126,132 @@ where p.tgl_pinjam between $P{tgl_awal} and $P{tgl_akhir}]]>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{headerPeriode}]]></textFieldExpression>
 			</textField>
+			<staticText>
+				<reportElement x="0" y="0" width="555" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Segoe UI" isBold="true"/>
+				</textElement>
+				<text><![CDATA[LAPORAN PINJAM BUKU]]></text>
+			</staticText>
 		</band>
 	</pageHeader>
 	<columnHeader>
-		<band height="20" splitType="Stretch">
+		<band height="15" splitType="Stretch">
 			<staticText>
-				<reportElement x="495" y="2" width="53" height="12"/>
-				<textElement textAlignment="Center">
-					<font fontName="Segoe UI" size="8" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Lama Pinjam]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="22" y="2" width="68" height="12"/>
+				<reportElement x="230" y="0" width="125" height="12"/>
 				<textElement>
 					<font fontName="Segoe UI" size="9" isBold="true"/>
 				</textElement>
-				<text><![CDATA[No. Dokumen]]></text>
+				<text><![CDATA[Nama Member]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="93" y="2" width="59" height="12"/>
+				<reportElement x="2" y="0" width="22" height="12" backcolor="#FF3333"/>
 				<textElement>
 					<font fontName="Segoe UI" size="9" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Tgl Pinjam]]></text>
+				<text><![CDATA[No.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="155" y="2" width="70" height="12"/>
+				<reportElement x="157" y="0" width="70" height="12"/>
 				<textElement>
 					<font fontName="Segoe UI" size="9" isBold="true"/>
 				</textElement>
 				<text><![CDATA[ID Member]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="228" y="2" width="125" height="12"/>
+				<reportElement x="95" y="0" width="59" height="12"/>
 				<textElement>
 					<font fontName="Segoe UI" size="9" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Nama Member]]></text>
+				<text><![CDATA[Tgl Pinjam]]></text>
 			</staticText>
 			<line>
-				<reportElement x="0" y="16" width="555" height="1"/>
+				<reportElement x="0" y="12" width="555" height="3"/>
 				<graphicElement>
 					<pen lineWidth="2.0" lineStyle="Double"/>
 				</graphicElement>
 			</line>
 			<staticText>
-				<reportElement x="423" y="2" width="69" height="12"/>
-				<textElement>
-					<font fontName="Segoe UI" size="8" isBold="true"/>
-				</textElement>
-				<text><![CDATA[No. HP]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="356" y="2" width="64" height="12"/>
+				<reportElement x="358" y="0" width="64" height="12"/>
 				<textElement>
 					<font fontName="Segoe UI" size="8" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Tgl Kembali]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="2" width="22" height="12" backcolor="#FF3333"/>
+				<reportElement x="497" y="0" width="53" height="12"/>
+				<textElement textAlignment="Center">
+					<font fontName="Segoe UI" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Lama Pinjam]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="24" y="0" width="68" height="12"/>
 				<textElement>
 					<font fontName="Segoe UI" size="9" isBold="true"/>
 				</textElement>
-				<text><![CDATA[No.]]></text>
+				<text><![CDATA[No. Dokumen]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="425" y="0" width="69" height="12"/>
+				<textElement>
+					<font fontName="Segoe UI" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[No. HP]]></text>
 			</staticText>
 		</band>
 	</columnHeader>
 	<detail>
-		<band height="20" splitType="Stretch">
+		<band height="18" splitType="Stretch">
 			<textField>
-				<reportElement x="22" y="2" width="32" height="11"/>
+				<reportElement x="25" y="0" width="32" height="11"/>
 				<textElement>
 					<font fontName="Segoe UI" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{kd_buku}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="54" y="2" width="142" height="11"/>
+				<reportElement x="57" y="0" width="142" height="11"/>
 				<textElement>
 					<font fontName="Segoe UI" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{nm_buku}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="196" y="2" width="37" height="11"/>
+				<reportElement x="199" y="0" width="37" height="11"/>
 				<textElement>
 					<font fontName="Segoe UI" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{th_penerbit}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="233" y="2" width="100" height="11"/>
+				<reportElement x="236" y="0" width="100" height="11"/>
 				<textElement>
 					<font fontName="Segoe UI" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{nm_penerbit}]]></textFieldExpression>
 			</textField>
 			<line>
-				<reportElement x="0" y="17" width="555" height="1"/>
+				<reportElement x="0" y="13" width="555" height="1"/>
 				<graphicElement>
 					<pen lineStyle="Dashed"/>
 				</graphicElement>
 			</line>
 		</band>
 	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
 	<pageFooter>
-		<band height="54" splitType="Stretch"/>
+		<band height="54" splitType="Stretch">
+			<textField evaluationTime="Auto">
+				<reportElement x="455" y="0" width="100" height="20"/>
+				<textElement textAlignment="Right">
+					<font fontName="Segoe UI" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{REPORT_PAGE} +" of " +$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
 	</pageFooter>
 	<summary>
 		<band height="42" splitType="Stretch"/>
