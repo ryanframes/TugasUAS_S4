@@ -57,10 +57,10 @@ public class frmMember extends javax.swing.JInternalFrame {
                 if (rs.next()) {
                     cls.showMsg("ID Member [" + txtIDMember.getText().toString() + "] sudah "
                             + "terdaftar dengan nama [" + rs.getString("nama") + "]", "Simpan Gagal", 0);
+                    txtIDMember.grabFocus();
+                    return false;
                 }
                 rs.close();
-                txtIDMember.grabFocus();
-                return false;
             } catch (SQLException ex) {
                 Logger.getLogger(frmBuku.class.getName()).log(Level.SEVERE, null, ex);
             }

@@ -43,10 +43,10 @@ public class frmUser extends javax.swing.JInternalFrame {
                 if (rs.next()) {
                     cls.showMsg("Nama user [" + txtUser.getText().toString() + "] sudah "
                             + "terdaftar", "Simpan Gagal", 0);
+                    txtUser.grabFocus();
+                    return false;
                 }
                 rs.close();
-                txtUser.grabFocus();
-                return false;
             } catch (SQLException ex) {
                 Logger.getLogger(frmBuku.class.getName()).log(Level.SEVERE, null, ex);
             }
