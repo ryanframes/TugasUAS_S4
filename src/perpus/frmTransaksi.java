@@ -145,7 +145,7 @@ public class frmTransaksi extends javax.swing.JInternalFrame {
                         + "from t_buku b left join (select count(kd_buku) as qty, "
                         + "kd_buku from t_pinjam_det d "
                         + "join t_pinjam p on p.no_dok = d.no_dok "
-                        + "where tgl_kembali is null group by kd_buku) inv "
+                        + "where tgl_kembali is null and d.no_dok <> '"+ txtDokumen.getText() + "' group by kd_buku) inv "
                         + "on inv.kd_buku = b.kd_buku where b.kd_buku = '" + kd_buku + "'");
                 if (rs.next()) {
                     qty=rs.getInt("sisa");
