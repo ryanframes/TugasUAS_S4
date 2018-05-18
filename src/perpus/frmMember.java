@@ -666,7 +666,7 @@ public class frmMember extends javax.swing.JInternalFrame {
                 oConn.setData("delete from t_member where id_member = '"
                     + txtIDMember.getText() + "'");
                 cmdDisplay.doClick();
-                cls.showMsg("Kode Buku ["+ txtIDMember.getText() +" - " +
+                cls.showMsg("Data Member ["+ txtIDMember.getText() +" - " +
                     txtNama.getText() + "] berhasil di hapus.", "Hapus Berhasil", 0);
                 textMode(true);
                 clrForm();

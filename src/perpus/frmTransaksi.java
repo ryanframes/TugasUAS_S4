@@ -134,6 +134,33 @@ public class frmTransaksi extends javax.swing.JInternalFrame {
             txtQty.grabFocus();
             return false;
         }
+        //check qty stok buku
+        ResultSet rs;
+        String kd_buku;
+        int qty;
+        for (int i=0;i<tblDetail.getRowCount();i++) {
+            try {
+                kd_buku=(String)tblDetail.getValueAt(i, 0).toString();
+                rs=oConn.getData("select stok_buku - ifnull(qty,0) as sisa "
+                        + "from t_buku b left join (select count(kd_buku) as qty, "
+                        + "kd_buku from t_pinjam_det d "
+                        + "join t_pinjam p on p.no_dok = d.no_dok "
+                        + "where tgl_kembali is null group by kd_buku) inv "
+                        + "on inv.kd_buku = b.kd_buku where b.kd_buku = '" + kd_buku + "'");
+                if (rs.next()) {
+                    qty=rs.getInt("sisa");
+                    if (qty <= 0) {
+                        cls.showMsg("Stok Buku [" + kd_buku + " - " + 
+                            tblDetail.getValueAt(i, 1) + "] tidak cukup", "Simpan Gagal", 0);
+                        rs.close();
+                        return false;
+                    }
+                }
+                rs.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(frmTransaksi.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
         return true;
     }
     
@@ -1321,7 +1348,7 @@ public class frmTransaksi extends javax.swing.JInternalFrame {
                 cls.showMsg("Dokumen No. ["+ txtDokumen.getText() +" - " +
                     txtNamaMember.getText() + "] berhasil di hapus.", "Hapus Berhasil", 0);
                 cmdDisplay.doClick();
-                textMode(true);
+                textMode(false);
                 clrForm();
             } catch (SQLException ex) {
                 cls.showMsg(ex.getMessage(), "Error", 0);

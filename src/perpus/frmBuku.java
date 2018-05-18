@@ -766,11 +766,15 @@ public class frmBuku extends javax.swing.JInternalFrame {
     private void cmdDisplayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdDisplayActionPerformed
         try {
             // TODO add your handling code here:
-            cls.showTblGrid(tblBuku, "select kd_buku as 'Kode Buku', "
+            cls.showTblGrid(tblBuku, "select b.kd_buku as 'Kode Buku', "
                 + "nm_buku as 'Nama Buku', nm_penerbit as 'Nama Penerbit', "
                 + "th_penerbit as 'Thn Penerbit', nm_penulis as 'Penulis', "
-                + "deskripsi as 'Deskripsi', stok_buku as 'Stok' from t_buku where "
-                + "nm_buku like '%" + txtCari.getText() + "%'");
+                + "deskripsi as 'Deskripsi', stok_buku as 'Stok', qty as 'Dipinjam', "
+                + "stok_buku - ifnull(qty,0) as 'Sisa' from t_buku b left join "
+                + "(select count(kd_buku) as qty, kd_buku from t_pinjam_det d "
+                + "join t_pinjam p on p.no_dok = d.no_dok " 
+                + "where tgl_kembali is null group by kd_buku) inv on "
+                + "inv.kd_buku = b.kd_buku where nm_buku like '%" + txtCari.getText() + "%'");
             tblBuku.setEditingColumn(0);
             tblBuku.setEditingRow(0);
         } catch (SQLException ex) {
